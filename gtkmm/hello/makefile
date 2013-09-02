@@ -1,20 +1,18 @@
 
 # configurations
 SRC = $(wildcard *.cc)
-OBJ = ${SRC:.cc=.o}
+OBJ = $(SRC:.cc=.o)
 DST = output
 APP = output
 VER = 1.0
 ARG =
-FLAGS = -Wall -O3 -std=gnu++0x
-FLAGS += `pkg-config --cflags --libs gtkmm-3.0`
+FLG = -Wall -O3 -std=gnu++0x
+LIB = `pkg-config --cflags --libs gtkmm-3.0`
+
 
 # interfaces
+.PHONY: all clean cleanall rebuild package test commit
 all: config.h $(DST)
-config.h: makefile
-	echo "#pragma once" > config.h
-	echo "#define APP_NAME \"$(APP)\"" >> config.h
-	echo "#define APP_VER  \"$(VER)\"" >> config.h
 clean:
 	rm -f config.h $(OBJ)
 cleanall: clean
@@ -28,10 +26,18 @@ package:
 	rm -rf $(APP)-$(VER)
 test: all
 	./$(DST) $(ARG)
+commit: cleanall
+	git add -A .
+	git commit -a || true
 
 # rules
+config.h: makefile
+	echo "#pragma once" > config.h
+	echo "#define APP_NAME \"$(APP)\"" >> config.h
+	echo "#define APP_VER  \"$(VER)\"" >> config.h
 $(DST): $(OBJ)
-	g++ -o $@ $^ $(FLAGS)
+	g++ -o $@ $^ $(FLG) $(LIB)
 .cc.o:
-	g++ -c -o $@ $< $(FLAGS)
+	g++ -c -o $@ $< $(FLG) $(LIB)
+$(foreach file,$(SRC),$(eval $(shell g++ -MM $(FLG) $(file))))
 
