@@ -2,8 +2,8 @@
 # configurations
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-DST = jm
-APP = jm
+DST = mousemidi
+APP = mousemidi
 VER = 0.10
 ARG =
 FLG = -Wall -O3 -std=gnu11 -I.
@@ -40,7 +40,7 @@ config.h: makefile
 	echo "#define APP_NAME \"$(APP)\"" >> config.h
 	echo "#define APP_VER  \"$(VER)\"" >> config.h
 $(DST): $(OBJ) makefile
-	gcc -o $@ $< $(FLG) $(LIB)
+	gcc -o $@ $(OBJ) $(FLG) $(LIB)
 .c.o:
 	gcc -c -o $@ $< $(FLG) $(LIB)
 $(foreach file,$(SRC),$(eval $(shell gcc -MM $(FLG) $(file)) config.h makefile))
