@@ -19,6 +19,11 @@ typedef struct MidiEvent
 MidiEvent;
 
 
+static inline MidiEvent midi_empty()
+{
+	return (MidiEvent){{ 0, 0, 0 }};
+}
+
 static inline MidiEvent midi_key_press(
 		jack_midi_data_t channel,
 		jack_midi_data_t note,

@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	}));
 
 	jack_init($(MidiEvent, () {
-		return midi_panic();
+		return midi_empty();
 	}));
 
 	jack_start();

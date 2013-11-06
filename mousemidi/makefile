@@ -5,9 +5,9 @@ OBJ = $(SRC:.c=.o)
 DST = mousemidi
 APP = mousemidi
 VER = 0.10
-ARG =
+ARG = /dev/input/mice
 FLG = -Wall -O3 -std=gnu11 -I.
-LIB = -ljack -lpthread
+LIB = -ljack -lpthread -lm
 
 # interfaces
 .PHONY: all clean cleanall rebuild package test commit install uninstall

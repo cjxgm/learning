@@ -19,5 +19,6 @@ MouseAction;
 typedef void (*MouseActionChangeFunc)(MouseAction ma);
 
 void mouse_init(const char * mouse_file, MouseActionChangeFunc mac);
+void mouse_next_frame();
 void mouse_mainloop();
 

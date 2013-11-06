@@ -9,6 +9,7 @@
 #include "jack.h"
 #include "util.h"
 #include "midi.h"
+#include "mouse.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <jack/jack.h>
@@ -37,9 +38,12 @@ void jack_init(GetMidiEventFunc gme)
 	}), NULL);
 
 	jack_set_process_callback(jack, $(int, (jack_nframes_t nframe) {
+		mouse_next_frame();
+
 		void*  in = jack_port_get_buffer(ports_in [0], nframe);
 		void* out = jack_port_get_buffer(ports_out[0], nframe);
 		jack_midi_clear_buffer(out);
+
 		jack_nframes_t nevent = jack_midi_get_event_count(in);
 		for (int i=0; i<nevent; i++) {
 			jack_midi_event_t ev;
@@ -48,6 +52,7 @@ void jack_init(GetMidiEventFunc gme)
 			jack_midi_event_write(out, ev.time, ev.buffer, 3);
 			fflush(stdout);
 		}
+
 		MidiEvent me = get_midi_event();
 		if (midi_has_data(me)) {
 			jack_midi_event_write(out, 0, me.buffer, 3);
