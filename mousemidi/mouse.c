@@ -92,6 +92,9 @@ void mouse_mainloop()
 	while (1) {
 		fread(&e, sizeof(e), 1, fp);
 		e.y = -e.y;	// remember? it's flipped!
+		if (e.l) mouse_action_change(MOUSE_LEFT_DOWN);
+		if (e.r) mouse_action_change(MOUSE_RIGHT_DOWN);
+		if (e.m) mouse_action_change(MOUSE_MIDDLE_DOWN);
 	}
 }
 
