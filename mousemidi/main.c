@@ -10,23 +10,16 @@
 #include "midi.h"
 #include "mouse.h"
 #include "util.h"
+#include "seq.h"
 #include <err.h>
+#include <stdlib.h>
 
 
 int main(int argc, char* argv[])
 {
 	if (argc != 2) err(1, "usage: %s mouse_device_file", argv[0]);
 
-	static unsigned char notes[] = {
-		0x32, 0x37, 0x3b, 0x37, 0x3e, 0x37, 0x3b, 0x37,
-		0x32, 0x37, 0x3b, 0x37, 0x3e, 0x37, 0x3b, 0x37,
-		0x32, 0x36, 0x39, 0x36, 0x3e, 0x36, 0x39, 0x36,
-		0x32, 0x36, 0x39, 0x36, 0x3e, 0x36, 0x39, 0x36,
-		0x34, 0x37, 0x3b, 0x37, 0x40, 0x37, 0x3b, 0x37,
-		0x34, 0x37, 0x3b, 0x37, 0x40, 0x37, 0x3b, 0x37,
-		0x32, 0x36, 0x39, 0x36, 0x3e, 0x36, 0x39, 0x36,
-		0x32, 0x36, 0x39, 0x36, 0x3e, 0x36, 0x39, 0x36,
-	};
+	unsigned char* notes = seq_load("music.seq");
 	int note_pos = 0;
 	int note_status = 0;
 
@@ -38,6 +31,9 @@ int main(int argc, char* argv[])
 				break;
 			case MOUSE_LEFT_DOWN:
 				note_status = 4;
+				break;
+			case MOUSE_RIGHT_DOWN:
+				note_status = 5;
 				break;
 			default: break;
 		}
@@ -52,9 +48,14 @@ int main(int argc, char* argv[])
 				break;
 			case 3:
 				me = midi_key_release(0, notes[note_pos++]);
-				note_pos %= sizeof(notes) / sizeof(*notes);
+				if (!notes[note_pos]) note_pos = 0;
 				note_status = 0;
 				break;
+			case 5: {
+				unsigned char* old_notes = notes;
+				notes = seq_load("music.seq");
+				free(old_notes);
+			}	// fall through intended
 			case 4:
 				me = midi_panic();
 				note_pos = 0;
