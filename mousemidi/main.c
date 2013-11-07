@@ -39,15 +39,14 @@ int main(int argc, char* argv[])
 		}
 	}));
 
-	jack_init($(MidiEvent, () {
-		MidiEvent me = midi_empty();
+	jack_init($(void, () {
 		switch (note_status) {
 			case 1:
-				me = midi_key_press(0, notes[note_pos], 0x60);
+				midi_key_press(0, notes[note_pos], 0x60);
 				note_status++;
 				break;
 			case 3:
-				me = midi_key_release(0, notes[note_pos++]);
+				midi_key_release(0, notes[note_pos++]);
 				if (!notes[note_pos]) note_pos = 0;
 				note_status = 0;
 				break;
@@ -57,12 +56,11 @@ int main(int argc, char* argv[])
 				free(old_notes);
 			}	// fall through intended
 			case 4:
-				me = midi_panic();
+				midi_panic();
 				note_pos = 0;
 				note_status = 0;
 				break;
 		}
-		return me;
 	}));
 
 	jack_start();

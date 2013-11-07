@@ -19,38 +19,40 @@ typedef struct MidiEvent
 MidiEvent;
 
 
-static inline MidiEvent midi_empty()
+// midi event queue management
+void midi_push(MidiEvent me);
+MidiEvent midi_pop();
+int midi_count();
+
+
+
+
+// common events pushing helpers
+static inline void midi_push_literal(
+		jack_midi_data_t a,
+		jack_midi_data_t b,
+		jack_midi_data_t c)
 {
-	return (MidiEvent){{ 0, 0, 0 }};
+	midi_push((MidiEvent){{ a, b, c }});
 }
 
-static inline MidiEvent midi_key_press(
+static inline void midi_key_press(
 		jack_midi_data_t channel,
 		jack_midi_data_t note,
 		jack_midi_data_t velocity)
 {
-	return (MidiEvent){{ 0x90+channel, note, velocity }};
+	midi_push_literal(0x90+channel, note, velocity);
 }
 
-static inline MidiEvent midi_key_release(
+static inline void midi_key_release(
 		jack_midi_data_t channel,
 		jack_midi_data_t note)
 {
-	return (MidiEvent){{ 0x80+channel, note, 0 }};
+	midi_push_literal(0x80+channel, note, 0);
 }
 
-static inline MidiEvent midi_panic()
+static inline void midi_panic()
 {
-	return (MidiEvent){{ 0xb0, 0x7b, 0 }};
-}
-
-static inline int midi_has_data(MidiEvent ev)
-{
-	return !!ev.buffer[0];
-}
-
-static inline void midi_reset(MidiEvent* ev)
-{
-	ev->buffer[0] = ev->buffer[1] = ev->buffer[2];
+	midi_push_literal(0xb0, 0x7b, 0);
 }
 

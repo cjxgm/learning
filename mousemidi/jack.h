@@ -10,9 +10,9 @@
 
 #include "midi.h"
 
-typedef MidiEvent (*GetMidiEventFunc)();
+typedef void (*NextFrameCb)();
 
-void jack_init(GetMidiEventFunc get_midi_event);
+void jack_init(NextFrameCb next_frame_cb);
 void jack_start();
 void jack_close();
 

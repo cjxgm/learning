@@ -23,10 +23,10 @@
 static jack_client_t	* jack;
 static jack_port_t		* ports_in [2];
 static jack_port_t		* ports_out[2];
-static GetMidiEventFunc   get_midi_event;
+static NextFrameCb		  next_frame_cb;
 
 
-void jack_init(GetMidiEventFunc gme)
+void jack_init(NextFrameCb nfc)
 {
 	// connect to jack
 	if (!(jack = jack_client_open("mousemidi", JackNoStartServer, NULL)))
@@ -39,6 +39,7 @@ void jack_init(GetMidiEventFunc gme)
 
 	jack_set_process_callback(jack, $(int, (jack_nframes_t nframe) {
 		mouse_next_frame();
+		if (next_frame_cb) next_frame_cb();
 
 		void*  in = jack_port_get_buffer(ports_in [0], nframe);
 		void* out = jack_port_get_buffer(ports_out[0], nframe);
@@ -48,17 +49,19 @@ void jack_init(GetMidiEventFunc gme)
 		for (int i=0; i<nevent; i++) {
 			jack_midi_event_t ev;
 			jack_midi_event_get(&ev, in, i);
-			printf("%d: %.2X %.2X %.2X\n", ev.time, ev.buffer[0], ev.buffer[1], ev.buffer[2]);
+			printf("%d: %.2X %.2X %.2X\n", ev.time,
+					ev.buffer[0], ev.buffer[1], ev.buffer[2]);
 			jack_midi_event_write(out, ev.time, ev.buffer, 3);
 			fflush(stdout);
 		}
 
-		MidiEvent me = get_midi_event();
-		if (midi_has_data(me)) {
+		while (midi_count()) {
+			MidiEvent me = midi_pop();
 			jack_midi_event_write(out, 0, me.buffer, 3);
 			printf(">>> %.2X %.2X %.2X\n",
 					me.buffer[0], me.buffer[1], me.buffer[2]);
 		}
+
 		return 0;
 	}), NULL);
 
@@ -75,8 +78,8 @@ void jack_init(GetMidiEventFunc gme)
 			JACK_DEFAULT_AUDIO_TYPE,
 			JackPortIsOutput|JackPortIsPhysical|JackPortIsTerminal, 0);
 
-	// save get_midi_event
-	get_midi_event = gme;
+	// save callback(s)
+	next_frame_cb = nfc;
 }
 
 

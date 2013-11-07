@@ -9,5 +9,6 @@
 #pragma once
 
 // anonymous function
-#define $(ret, body) ({ ret __anonymous__ body (void*)&__anonymous__; })
+#define $(ret, body)	({ ret __anonymous__ body (void*)&__anonymous__; })
+#define LEN(ARRAY)		(sizeof(ARRAY) / sizeof(*(ARRAY)))
 
