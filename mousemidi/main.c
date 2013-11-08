@@ -19,49 +19,19 @@ int main(int argc, char* argv[])
 {
 	if (argc != 2) err(1, "usage: %s mouse_device_file", argv[0]);
 
-	unsigned char* notes = seq_load("music.seq");
-	int note_pos = 0;
-	int note_status = 0;
+	seq_load("music.seq");
 
 	mouse_init(argv[1], $(void, (MouseAction ma) {
 		switch (ma) {
-			case MOUSE_HIT_CORNER:
-			case MOUSE_LEAVE_CORNER:
-				note_status++;
-				break;
-			case MOUSE_LEFT_DOWN:
-				note_status = 4;
-				break;
-			case MOUSE_RIGHT_DOWN:
-				note_status = 5;
-				break;
-			default: break;
+			case MOUSE_HIT_CORNER:		seq_play();					break;
+			case MOUSE_LEAVE_CORNER:	seq_stop();					break;
+			case MOUSE_LEFT_DOWN:		seq_reset();				break;
+			case MOUSE_RIGHT_DOWN:		seq_load("music.seq");		break;
+			default:												break;
 		}
 	}));
 
-	jack_init($(void, () {
-		switch (note_status) {
-			case 1:
-				midi_key_press(0, notes[note_pos], 0x60);
-				note_status++;
-				break;
-			case 3:
-				midi_key_release(0, notes[note_pos++]);
-				if (!notes[note_pos]) note_pos = 0;
-				note_status = 0;
-				break;
-			case 5: {
-				unsigned char* old_notes = notes;
-				notes = seq_load("music.seq");
-				free(old_notes);
-			}	// fall through intended
-			case 4:
-				midi_panic();
-				note_pos = 0;
-				note_status = 0;
-				break;
-		}
-	}));
+	jack_init(NULL);
 
 	jack_start();
 	mouse_mainloop();

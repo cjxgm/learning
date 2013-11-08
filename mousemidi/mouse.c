@@ -89,12 +89,34 @@ void mouse_next_frame()
 
 void mouse_mainloop()
 {
+	char last_l = 0;
+	char last_r = 0;
+	char last_m = 0;
+
 	while (1) {
 		fread(&e, sizeof(e), 1, fp);
 		e.y = -e.y;	// remember? it's flipped!
-		if (e.l) mouse_action_change(MOUSE_LEFT_DOWN);
-		if (e.r) mouse_action_change(MOUSE_RIGHT_DOWN);
-		if (e.m) mouse_action_change(MOUSE_MIDDLE_DOWN);
+
+		if (e.l) {
+			if (!last_l) {
+				last_l = 1;
+				mouse_action_change(MOUSE_LEFT_DOWN);
+			}
+		} else last_l = 0;
+
+		if (e.r) {
+			if (!last_r) {
+				last_r = 1;
+				mouse_action_change(MOUSE_RIGHT_DOWN);
+			}
+		} else last_r = 0;
+
+		if (e.m) {
+			if (!last_m) {
+				last_m = 1;
+				mouse_action_change(MOUSE_MIDDLE_DOWN);
+			}
+		} else last_m = 0;
 	}
 }
 

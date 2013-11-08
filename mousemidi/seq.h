@@ -8,5 +8,8 @@
 
 #pragma once
 
-unsigned char* seq_load(const char* file);
+void seq_load(const char* file);
+void seq_play();
+void seq_stop();
+void seq_reset();
 
