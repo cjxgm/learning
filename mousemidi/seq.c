@@ -17,6 +17,7 @@ typedef enum NoteType
 {
 	NOTE_END,
 	NOTE_MUSICAL,
+	NOTE_VOLUME,
 }
 NoteType;
 
@@ -31,6 +32,7 @@ Note;
 
 static Note* notes;
 static Note* note_current;
+static unsigned char volume;
 
 void seq_load(const char* file)
 {
@@ -79,12 +81,20 @@ void seq_load(const char* file)
 		if (s[0] == 'S') pitch_shift = (s[1]-'0')*10 + s[2]-'0';
 		else {
 			Note n;
-			n.type  = NOTE_MUSICAL;
-			n.value = note_to_midi();
 			n.next  = !!s[3];
 			n.rewind= rewind;
 			if (s[3]) rewind++;
 			else      rewind = 0;
+			switch (s[0]) {
+				case 'V':
+					n.type  = NOTE_VOLUME;
+					n.value = ((s[1]-'0')*10 + s[2]-'0') * 127 / 99;
+					break;
+				default:
+					n.type  = NOTE_MUSICAL;
+					n.value = note_to_midi();
+					break;
+			}
 			append(n);
 		}
 	}
@@ -100,16 +110,15 @@ void seq_load(const char* file)
 
 void seq_play()
 {
-	for (;; note_current++) {
-		if (note_current->type == NOTE_END)
-			err(1, "let's fuck your score's last note");
-
-		if (note_current->type == NOTE_MUSICAL) {
-			midi_key_press(0, note_current->value, 0x60);
-			if (!note_current->next) break;
+	for (;; note_current++)
+		switch (note_current->type) {
+			case NOTE_END: err(1, "let's fuck your score's last note");
+			case NOTE_VOLUME: volume = note_current->value; break;
+			case NOTE_MUSICAL:
+				midi_key_press(0, note_current->value, volume);
+				if (!note_current->next) return;
+				break;
 		}
-		else continue;
-	}
 }
 
 void seq_stop()
@@ -125,6 +134,7 @@ void seq_stop()
 void seq_reset()
 {
 	note_current = notes;
+	volume = 0x60;
 	midi_panic();
 }
 
