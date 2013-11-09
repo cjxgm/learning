@@ -20,7 +20,6 @@ int main(int argc, char* argv[])
 	if (argc != 2) err(1, "usage: %s mouse_device_file", argv[0]);
 
 	seq_load("music.seq");
-
 	mouse_init(argv[1], $(void, (MouseAction ma) {
 		switch (ma) {
 			case MOUSE_HIT_CORNER:		seq_play();					break;
@@ -30,9 +29,7 @@ int main(int argc, char* argv[])
 			default:												break;
 		}
 	}));
-
 	jack_init(NULL);
-
 	jack_start();
 	mouse_mainloop();
 
