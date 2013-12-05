@@ -1,7 +1,9 @@
-test:
-	./digraph.pl demo.rst | rst2latex | pdflatex
-	mv texput.pdf demo.pdf
-	rm -f texput.*
+all: to-html
+clean:
 	rm -rf digraph/
-	evince demo.pdf
+	rm -f demo.html
+to-html: demo.rst
+	./digraph.pl demo.rst | rst2html > demo.html
+test: all
+	xdg-open demo.html > /dev/null
 
