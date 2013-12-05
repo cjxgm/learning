@@ -17,6 +17,7 @@ while (<>) {
 			open my $f, "|dot -T$format -odigraph/$name.$format";
 			print $f $code;
 			close $f;
+			print "..\tclass:: digraph\n";
 			print "..\timage:: digraph/$name.$format\n\n";
 			$code = undef;
 		}
