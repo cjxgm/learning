@@ -5,7 +5,7 @@ test
 
 Success node:
 
-..	digraph::
+..	digraph:: success-node
 	success
 
 

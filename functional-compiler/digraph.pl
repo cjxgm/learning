@@ -2,7 +2,7 @@
 system "rm -rf digraph/ && mkdir digraph" and die $?;
 
 my $header = <<EOF;
-	node [fontname=monospace]
+	node [fontsize=12]
 EOF
 my $format = "svg";
 
