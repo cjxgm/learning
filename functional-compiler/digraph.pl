@@ -17,12 +17,12 @@ while (<>) {
 			open my $f, "|dot -T$format -odigraph/$name.$format";
 			print $f $code;
 			close $f;
-			print "\n.. image:: digraph/$name.$format\n";
+			print "..\timage:: digraph/$name.$format\n\n";
 			$code = undef;
 		}
 		else { $code .= $_ }
 	} else {
-		if (/^\s*\.\. digraph::\s*([^\s]*)\s*$/) {
+		if (/^\s*\.\.\s+digraph::\s*([^\s]*)\s*$/) {
 			$name = $1 || "digraph-@{[$id++]}";
 			$code = "digraph\n{\n$header";
 		}
