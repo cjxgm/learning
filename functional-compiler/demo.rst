@@ -60,31 +60,32 @@ Building Blocks
 Conventions
 ~~~~~~~~~~~
 
-A node named a capital letter with orange color represent any node.
+A node named by a capital letter with orange color represent any legal
+nodes.
 
 ..	digraph::
 	X [color=orange]
 
 
-Nodes that do Nothing
-~~~~~~~~~~~~~~~~~~~~~
+Atomic Nodes
+~~~~~~~~~~~~
 
-:code:`success` node does nothing but return success:
+:code:`success` node (|as| :code:`success`) does *nothing*
+but returns *success*:
 
 ..	digraph::
 	success [color=green]
 
-:code:`failure` node does nothing but return failure:
+:code:`failure` node (|as| :code:`failure`) does *nothing*
+but returns *failure*:
 
 ..	digraph::
 	failure [color=red]
 
 
-Nodes that Connect Other Nodes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:code:`sequence` node runs its left node, if succeed run its right node.
-Succeed only if both of its child nodes succeed:
+:code:`sequence` node (|as| :code:`A+B`) runs its left node.
+If succeeds, it runs its right node.
+Succeed |iff| *both* of its child nodes *succeed*:
 
 ..	digraph::
 	sequence [color=magenta]
@@ -93,27 +94,148 @@ Succeed only if both of its child nodes succeed:
 	sequence -> A
 	sequence -> B
 
-:code:`branch` node runs both of its left and right node.
-Succeed only if at least one of its child nodes succeed:
+:code:`branch` node (|as| :code:`A||B`) runs both of its left
+and right node.
+Succeed |iff| *at least 1* of its child nodes *succeed*:
 
 ..	digraph::
 	branch [color=blue]
-
-This is how it can be used:
-
-..	digraph:: one-or-zero-time
+	A [color=orange]
+	B [color=orange]
 	branch -> A
-	branch -> success
+	branch -> B
+
+:code:`match` node (|as| :code:`'x'`, or |as| ascii :code:`120`)
+matches one character 'x' (ascii 120).
+Succeed |iff| matching succeed.
 
 ..	digraph::
-	yes[label="yes!"]
+	x [color=brown label="'x'"]
 
+
+Repeat Nodes
+~~~~~~~~~~~~
+
+With atomic nodes, we can build more complex nodes based on them.
+Now, let's make some nodes that do repeating things.
+
+:code:`whether` node (|as| :code:`!A`) *repeat* its child
+*1 or 0* time.
+Succeed *without* caring if its child succeed just like :code:`?` in
+regular expressions.
+
+..	sidebar:: Note
+
+	In the figure, the *left* side is the *representation*,
+	while the *right* side is the *implementation*.
+
+	**Same for all the following figures if not stated otherwise.**
+
+..	digraph::
+	whether -> A1
+	branch -> A2
+	branch -> success
+	A1 [color=orange label=A]
+	A2 [color=orange label=A]
+	branch [color=blue]
+	success [color=green]
+
+
+:code:`times` node (|as| :code:`A*n`, where :math:`n \ge 2`) *repeat*
+its child *n* times.
+Succeed |iff| its child succeed *n* times.
+
+..	sidebar:: Note
+
+	We used *closed-interval* :math:`[n, n]` in the graph.
+
+	It's a recursive definition. We can also write it as
+	:code:`A*n = A*(n-1)+A`
+
+..	digraph::
+	times -> A1
+	sequence -> times_1 -> A2
+	sequence -> A3
+	A1 [color=orange label=A]
+	A2 [color=orange label=A]
+	A3 [color=orange label=A]
+	times [label="[n, n]"]
+	times_1 [label="[n-1, n-1]"]
+	sequence [color=magenta]
+
+..	sidebar:: Note
+
+	This is the recursion base. We can also write it as:
+	:code:`A*2 = A+A`
+
+..	digraph::
+	times -> A1
+	sequence -> A2
+	sequence -> A3
+	A1 [color=orange label=A]
+	A2 [color=orange label=A]
+	A3 [color=orange label=A]
+	times [label="[2, 2]"]
+	sequence [color=magenta]
+
+:code:`more` node (|as| :code:`A*1`) *repeat*
+its child *at least 1* time.
+Succeed |iff| its child *succeed sequentially at least 1* time.
+
+..	sidebar:: Note
+
+	We used *closed-open-interval* :math:`[1, +\infty)` in the graph.
+
+	It's a recursive definition. We can also write it as
+	:code:`A*1 = A+!(A*1)`
+
+..	digraph::
+	more -> A1
+	sequence -> A2
+	sequence -> whether -> more_1 -> A3
+	A1 [color=orange label=A]
+	A2 [color=orange label=A]
+	A3 [color=orange label=A]
+	more [label="[1, +oo)"]
+	more_1 [label="[1, +oo]"]
+	sequence [color=magenta]
+
+:code:`whatever` node (|as| :code:`A*0`) *repeat*
+its child until first failure.
+Succeed anyway.
+
+..	sidebar:: Note
+
+	We used *closed-open-interval* :math:`[0, +\infty)` and
+	:math:`[1, +\infty)` in the graph.
+
+	It's a recursive definition. We can also write it as
+	:code:`A*0 = !(A*1)`
+
+..	digraph::
+	whatever -> A1
+	whether -> more -> A2
+	A1 [color=orange label=A]
+	A2 [color=orange label=A]
+	whatever [label="[0, +oo)"]
+	more [label="[1, +oo)"]
+
+
+
+
+..	......................................................................
+
+..	some replacements
+..	|as| replace:: written as
+..	|iff| replace:: *only if*
+
+..	stylish the document
 ..	raw:: html
 
 	<style>
-	.section { margin-left: 0.5em; }
-	.line-block { margin-left: 1em; }
-	p { margin-left: 1em; }
+	.section { margin: 0.5em; }
+	.line-block { margin: 1em; }
+	p { margin: 1em; }
 	.digraph {
 		display: block;
 		margin-left: auto;
