@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# see TODO for todo list
 system "rm -rf digraph/ && mkdir digraph" and die $?;
 
 my $header = <<EOF;
