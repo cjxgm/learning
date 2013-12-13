@@ -4,9 +4,9 @@
 =====================================
 Write a Compiler Simply and Elegantly
 =====================================
----------------------------
-the Functional Way in C++11
----------------------------
+---------------------
+with Lambdas in C++11
+---------------------
 :Author: eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
 
 .. contents:: Table of Contents
@@ -16,10 +16,11 @@ Introduction
 ============
 As we all know, writting a compiler by hand is challenging, but this
 article is aiming at making the process simple and elegant. You will
-be amazed about the simplicity when the functional ideas are introduced.
+be amazed about the simplicity when the functional ideas like lambdas
+and closures are introduced.
 
 Yes, we only borrow some ideas (closures and lambda functions) from
-functional programming, but not everything. We will not make things
+functional programming, not everything, such as we won't make things
 immutable.
 
 Blah blah blah...
@@ -66,6 +67,8 @@ nodes.
 ..	digraph::
 	X [color=orange]
 
+It can also be written in text as :code:`A`.
+
 
 Atomic Nodes
 ~~~~~~~~~~~~
@@ -82,7 +85,6 @@ but returns *failure*:
 ..	digraph::
 	failure [color=red]
 
-
 :code:`sequence` node (|as| :code:`A+B`) runs its left node.
 If succeeds, it runs its right node.
 Succeed |iff| *both* of its child nodes *succeed*:
@@ -94,7 +96,7 @@ Succeed |iff| *both* of its child nodes *succeed*:
 	sequence -> A
 	sequence -> B
 
-:code:`branch` node (|as| :code:`A||B`) runs both of its left
+:code:`branch` node (|as| :code:`A|B`) runs both of its left
 and right node.
 Succeed |iff| *at least 1* of its child nodes *succeed*:
 
@@ -129,7 +131,9 @@ regular expressions.
 	In the figure, the *left* side is the *representation*,
 	while the *right* side is the *implementation*.
 
-	**Same for all the following figures if not stated otherwise.**
+	**The same convention is used through out the article.**
+
+	We can also write it as :code:`!A = A|success`
 
 ..	digraph::
 	whether -> A1
