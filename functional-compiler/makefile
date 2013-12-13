@@ -6,4 +6,6 @@ to-html: demo.rst
 	./digraph.pl demo.rst | rst2html > demo.html
 test: all
 	xdg-open demo.html > /dev/null
+commit: clean
+	git commit -m "`date`" -p
 
