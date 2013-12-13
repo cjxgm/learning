@@ -1,0 +1,2 @@
+* embed digraph svg inside a raw directive
+* make it not compatible with HTML version less than 5

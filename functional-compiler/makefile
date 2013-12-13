@@ -7,5 +7,6 @@ to-html: demo.rst
 test: all
 	xdg-open demo.html > /dev/null
 commit: clean
+	git add . -A
 	git commit -m "`date`" -p
 
