@@ -154,8 +154,8 @@ Succeed |iff| its child succeed *n* times.
 
 ..	digraph::
 	times -> A1
-	sequence -> times_1 -> A2
-	sequence -> A3
+	sequence -> A2
+	sequence -> times_1 -> A3
 	A1 [color=orange label=A]
 	A2 [color=orange label=A]
 	A3 [color=orange label=A]
