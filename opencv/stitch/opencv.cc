@@ -30,6 +30,7 @@ int main()
 	}
 
 	// stitch
+	// http://docs.opencv.org/modules/stitching/doc/introduction.html
 	(cout << "stitching " << imgs.size() << " images...").flush();
 	Stitcher stitcher = Stitcher::createDefault(true);	// true for try_use_gpu
 	Mat result;
