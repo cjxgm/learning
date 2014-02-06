@@ -39,14 +39,14 @@ static void pluck_freq(float freq, float gain, float duration)
 {
 	int len = roundf(srate / freq);
 	float buf[len];
-	// use random number
+/*
+	// use random number: may be out of tune
 	for (int i=0; i<len; i++)
 		buf[i] = unirand();
-/*
+*/
 	// use saw wave
 	for (int i=0; i<len; i++)
 		buf[i] = i * 2.0f / len - 1;
-*/
 	ks_auto(buf, len, gain, ceilf(duration*srate/len));
 }
 
