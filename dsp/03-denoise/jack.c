@@ -6,7 +6,13 @@
 #include <pthread.h>
 #include "dsp.h"
 
+
+
+
 size_t srate;	// sample rate
+
+
+
 
 static jack_client_t* jack;
 static jack_port_t* port_wave_in ;
@@ -14,11 +20,17 @@ static jack_port_t* port_wave_out;
 static jack_port_t* port_midi_in ;
 static jack_port_t* port_midi_out;
 
-#define ERROR(RET, ARGS...) ({ fprintf(stderr, ARGS); exit(RET); })
+#define ERROR(RET, FMT, ARGS...) ({ \
+	fprintf(stderr, FMT "\n",## ARGS); \
+	exit(RET); \
+})
 
 static void shutdown_cb(void* arg);
 static int process_cb(jack_nframes_t nframe, void* arg);
 static int srate_cb(jack_nframes_t nframe, void* arg);
+
+
+
 
 int main()
 {
@@ -32,20 +44,21 @@ int main()
 	jack_set_sample_rate_callback(jack, &srate_cb, NULL);
 
 	// register ports
-	#define PORT(NAME, TYPE, DIRECTION) \
-		jack_port_register(jack, (NAME), \
+	#define PORT(VAR, TYPE, DIRECTION) \
+		port_ ## VAR = jack_port_register(jack, #VAR, \
 				JACK_DEFAULT_ ## TYPE ## _TYPE, \
-				JackPortIs ## DIRECTION ## put, 0)
+				JackPortIs ## DIRECTION ## put, 0); \
+		if (!(port_ ## VAR)) ERROR(2, "unable to register port %s", #VAR)
 
-	port_wave_in  = PORT( "input", AUDIO, In );
-	port_wave_out = PORT("output", AUDIO, Out);
-	port_midi_in  = PORT( "input",  MIDI, In );
-	port_midi_out = PORT("output",  MIDI, Out);
+	PORT(wave_in , AUDIO,  In);
+	PORT(wave_out, AUDIO, Out);
+	PORT(midi_in ,  MIDI,  In);
+	PORT(midi_out,  MIDI, Out);
 
 	#undef PORT
 
 	// activate jack
-	if (jack_activate(jack)) ERROR(2, "unable to activate jack");
+	if (jack_activate(jack)) ERROR(3, "unable to activate jack");
 
 	// kill main thread, then this process won't exit
 	pthread_exit(NULL);
@@ -54,45 +67,45 @@ int main()
 	return 0;
 }
 
-static void shutdown_cb(void* arg)
-{
-	exit(0);
-}
 
+
+
+static void* midi_out;	// <-- XXX midi_out defined here.
 static int process_cb(jack_nframes_t nframe, void* arg)
 {
 	void* wave_in  = jack_port_get_buffer(port_wave_in , nframe);
 	void* wave_out = jack_port_get_buffer(port_wave_out, nframe);
 	void* midi_in  = jack_port_get_buffer(port_midi_in , nframe);
-	void* midi_out = jack_port_get_buffer(port_midi_out, nframe);
-	jack_midi_clear_buffer(midi_out);
+	      midi_out = jack_port_get_buffer(port_midi_out, nframe);
+	jack_midi_clear_buffer(midi_out);	// clear first
 
-	process_wave(wave_in, wave_out, nframe);
-	process_midi(midi_in, midi_out, nframe);
-/*
-	jack_nframes_t nevent = jack_midi_get_event_count(in);
+	// notify midi events
+	jack_nframes_t nevent = jack_midi_get_event_count(midi_in);
 	for (int i=0; i<nevent; i++) {
 		jack_midi_event_t ev;
-		jack_midi_event_get(&ev, in, i);
-		printf("%d: %.2X %.2X %.2X\n", ev.time,
-				ev.buffer[0], ev.buffer[1], ev.buffer[2]);
-		jack_midi_event_write(out, ev.time, ev.buffer, 3);
-		fflush(stdout);
+		jack_midi_event_get(&ev, midi_in, i);
+		process_midi(ev.time, ev.buffer);
 	}
 
-	while (midi_count()) {
-		MidiEvent me = midi_pop();
-		jack_midi_event_write(out, 0, me.buffer, 3);
-		printf(">>> %.2X %.2X %.2X\n",
-				me.buffer[0], me.buffer[1], me.buffer[2]);
-	}
-*/
+	// process wave
+	process_wave(wave_in, wave_out, nframe);
+
 	return 0;
+}
+
+void midi_write(size_t frame, uint8_t ev[3])
+{
+	jack_midi_event_write(midi_out, frame, ev, 3);
 }
 
 static int srate_cb(jack_nframes_t nframe, void* arg)
 {
 	srate = nframe;
 	return 0;
+}
+
+static void shutdown_cb(void* arg)
+{
+	exit(0);
 }
 

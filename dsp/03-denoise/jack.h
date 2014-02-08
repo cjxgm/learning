@@ -4,3 +4,5 @@
 
 extern size_t srate;	// sample rate
 
+void midi_write(size_t frame, uint8_t ev[3]);
+
