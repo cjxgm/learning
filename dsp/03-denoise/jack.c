@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include "dsp.h"
 
+size_t srate;	// sample rate
+
 static jack_client_t* jack;
 static jack_port_t* port_wave_in ;
 static jack_port_t* port_wave_out;
@@ -16,6 +18,7 @@ static jack_port_t* port_midi_out;
 
 static void shutdown_cb(void* arg);
 static int process_cb(jack_nframes_t nframe, void* arg);
+static int srate_cb(jack_nframes_t nframe, void* arg);
 
 int main()
 {
@@ -26,6 +29,7 @@ int main()
 	// register callbacks
 	jack_on_shutdown(jack, &shutdown_cb, NULL);
 	jack_set_process_callback(jack, &process_cb, NULL);
+	jack_set_sample_rate_callback(jack, &srate_cb, NULL);
 
 	// register ports
 	#define PORT(NAME, TYPE, DIRECTION) \
@@ -37,6 +41,8 @@ int main()
 	port_wave_out = PORT("output", AUDIO, Out);
 	port_midi_in  = PORT( "input",  MIDI, In );
 	port_midi_out = PORT("output",  MIDI, Out);
+
+	#undef PORT
 
 	// activate jack
 	if (jack_activate(jack)) ERROR(2, "unable to activate jack");
@@ -81,6 +87,12 @@ static int process_cb(jack_nframes_t nframe, void* arg)
 				me.buffer[0], me.buffer[1], me.buffer[2]);
 	}
 */
+	return 0;
+}
+
+static int srate_cb(jack_nframes_t nframe, void* arg)
+{
+	srate = nframe;
 	return 0;
 }
 
