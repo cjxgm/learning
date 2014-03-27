@@ -23,7 +23,8 @@ package:
 	mv $(APP)-$(VER)/* .
 	rm -rf $(APP)-$(VER)
 test: all
-	./$(DST) $(ARG)
+	#./$(DST) $(ARG)
+	lua test.lua
 commit: cleanall
 	git add -A .
 	git diff --cached
