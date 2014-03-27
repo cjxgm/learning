@@ -7,8 +7,7 @@ VER = 0.10
 ARG =
 FLG = -march=native -Wall -O3 -std=gnu11
 LIB = `pkg-config --libs --cflags gstreamer-1.0`
-aaaaa:
-	echo $(SRC) $(DST)
+
 # interfaces
 .PHONY: all clean cleanall rebuild package test commit
 all: $(DST)
