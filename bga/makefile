@@ -2,6 +2,8 @@ CC = gcc
 LD = ld
 CCFLAGS = -m32 -Wall -O0
 LDFLAGS = -melf_i386 -Ttext=0
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
 
 all: kernel
 test: kernel
@@ -15,8 +17,9 @@ commit: cleanall
 	git diff --cached
 	git commit -a || true
 
-kernel.o: kernel.c makefile
-	$(CC) $(CCFLAGS) -c -o $@ $<
-kernel: kernel.o
+kernel: $(OBJ)
 	$(LD) $(LDFLAGS) -o $@ $^
+.c.o:
+	$(CC) $(CCFLAGS) -c -o $@ $<
+$(foreach file,$(SRC),$(eval $(shell gcc -MM $(FLG) $(file)) makefile))
 
