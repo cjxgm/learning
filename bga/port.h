@@ -1,5 +1,4 @@
 #pragma once
-
 #include "util.h"
 
 #define OUTPORT(name, size) \
