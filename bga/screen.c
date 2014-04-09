@@ -50,27 +50,27 @@ inline void putstr(const char* s)
 
 static const char hexdigits[] = "0123456789abcdef";
 
-#define PUTHEXC(name, size) \
-	inline void puthex##name##c(u##size hex, u8 color) \
+#define PUTHEXC(size) \
+	inline void puthex##size##c(u##size hex, u8 color) \
 	{ \
 		for (int i=(size>>2)-1; i>=0; i--) \
 			putcharc(hexdigits[(hex >> (i*4)) & 0xF], color); \
 	}
 
-#define PUTHEX(name, size) \
-	inline void puthex##name(u##size hex) \
+#define PUTHEX(size) \
+	inline void puthex##size(u##size hex) \
 	{ \
 		putstrc("0x", COLOR_YELLOW); \
-		puthex##name##c(hex, COLOR_YELLOW | COLOR_H); \
+		puthex##size##c(hex, COLOR_YELLOW | COLOR_H); \
 	}
 
-PUTHEXC(b, 8);
-PUTHEXC(w, 16);
-PUTHEXC(l, 32);
+PUTHEXC(8);
+PUTHEXC(16);
+PUTHEXC(32);
 
-PUTHEX(b, 8);
-PUTHEX(w, 16);
-PUTHEX(l, 32);
+PUTHEX(8);
+PUTHEX(16);
+PUTHEX(32);
 
 #undef PUTHEX
 #undef PUTHEXC

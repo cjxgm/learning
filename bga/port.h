@@ -1,8 +1,8 @@
 #pragma once
 #include "util.h"
 
-#define OUTPORT(name, size) \
-	static inline void out##name (u16 port, u##size data) \
+#define OUTPORT(size) \
+	static inline void out##size (u16 port, u##size data) \
 	{ \
 		asm volatile("out %[data], %[port]" \
 			:: \
@@ -11,8 +11,8 @@
 		); \
 	}
 
-#define INPORT(name, size) \
-	static inline u##size in##name(u16 port) \
+#define INPORT(size) \
+	static inline u##size in##size(u16 port) \
 	{ \
 		u##size data; \
 		asm("in %[port], %[data]" \
@@ -22,13 +22,13 @@
 		return data; \
 	}
 
-OUTPORT(b, 8);
-OUTPORT(w, 16);
-OUTPORT(l, 32);
+OUTPORT(8);
+OUTPORT(16);
+OUTPORT(32);
 
-INPORT(b, 8);
-INPORT(w, 16);
-INPORT(l, 32);
+INPORT(8);
+INPORT(16);
+INPORT(32);
 
 #undef INPORT
 #undef OUTPORT

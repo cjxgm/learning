@@ -16,15 +16,21 @@ void putstrc(const char* s, u8 color);
 void putstr(const char* s);
 
 
+
+
 //////////////////// put hex series ///////////////////
-#define PUTHEXC(name, size) void puthex##name##c(u##size hex, u8 color)
-#define PUTHEX(name, size) void puthex##name(u##size hex)
-PUTHEXC(b, 8);
-PUTHEXC(w, 16);
-PUTHEXC(l, 32);
-PUTHEX(b, 8);
-PUTHEX(w, 16);
-PUTHEX(l, 32);
+
+#define PUTHEXC(size) void puthex##size##c(u##size hex, u8 color)
+#define PUTHEX(size) void puthex##size(u##size hex)
+
+PUTHEXC(8);
+PUTHEXC(16);
+PUTHEXC(32);
+
+PUTHEX(8);
+PUTHEX(16);
+PUTHEX(32);
+
 #undef PUTHEX
 #undef PUTHEXC
 
