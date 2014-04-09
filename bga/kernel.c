@@ -1,4 +1,5 @@
 #include "util.h"
+#include "port.h"
 
 typedef struct Glyph
 {
@@ -14,5 +15,6 @@ void main()
 {
 	text[0].color = 0b0100;
 	text[0].ch = 'a';
+	outb(1, 2);
 }
 
