@@ -1,8 +1,10 @@
-#include "screen.h"
-#include "port.h"
+#include "main.hh"
+//#include "screen.hh"
+#include "port.hh"
 
-void main()
+void kernel::main()
 {
+/*
 	charpos(1, 1);
 	putchar('a');
 
@@ -16,5 +18,6 @@ void main()
 	puthex16(0x9abc);
 	puthex8(0xde);
 	puthex8(0xF);
+*/
 }
 

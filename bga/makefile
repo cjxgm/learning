@@ -1,9 +1,9 @@
-CC = gcc
+CC = g++
 LD = ld
-CCFLAGS = -m32 -Wall -O0 -std=gnu11 -nostdinc -nostdlib -ffreestanding
+CCFLAGS = -m32 -Wall -O0 -std=gnu++11 -nostdinc -nostdlib -ffreestanding
 LDFLAGS = -melf_i386 -Ttext=0
-SRC = $(wildcard *.c)
-OBJ = $(SRC:.c=.o)
+SRC = $(wildcard *.cc)
+OBJ = $(SRC:.cc=.o)
 
 all: kernel
 test: kernel
@@ -19,7 +19,7 @@ commit: cleanall
 
 kernel: $(OBJ)
 	$(LD) $(LDFLAGS) -o $@ $^
-.c.o:
+.cc.o:
 	$(CC) $(CCFLAGS) -c -o $@ $<
 $(foreach file,$(SRC),$(eval $(shell gcc -MM $(FLG) $(file)) makefile))
 

@@ -8,8 +8,8 @@ typedef struct Glyph
 PACKED
 Glyph;
 
-static Glyph* const text = ANY 0xb8000;
-static Glyph* current = ANY 0xb8000;
+static Glyph* const text = (Glyph*)0xb8000;
+static Glyph* current = (Glyph*) 0xb8000;
 
 
 static inline void set(Glyph* g, u8 ch, u8 color)
