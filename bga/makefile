@@ -1,6 +1,6 @@
 CC = gcc
 LD = ld
-CCFLAGS = -m32 -Wall -O0 -nostdinc -nostdlib -ffreestanding
+CCFLAGS = -m32 -Wall -O0 -std=gnu11 -nostdinc -nostdlib -ffreestanding
 LDFLAGS = -melf_i386 -Ttext=0
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)

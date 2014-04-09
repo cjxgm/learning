@@ -12,5 +12,9 @@ void main()
 
 	charpos(4, 0);
 	putstrc("Hello, World!", COLOR_H|COLOR_R|COLOR_G | COLOR_BG(COLOR_B));
+	puthexl(0x12345678);
+	puthexw(0x9abc);
+	puthexb(0xde);
+	puthexb(0xF);
 }
 
