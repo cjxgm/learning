@@ -1,23 +1,25 @@
 #include "main.hh"
-//#include "screen.hh"
+#include "screen.hh"
 #include "port.hh"
 
 void kernel::main()
 {
-/*
-	charpos(1, 1);
-	putchar('a');
+	screen::cursor(1, 1);
+	screen::put('a');
 
-	charpos(0, 0);
-	putcharc(in8(1) + 'a', COLOR_R);
-	out8(1, 2);
+	screen::cursor(0, 0);
+	screen::put(port::in<u8>(1) + 'a', screen::color::rgbh(1, 0, 0));
+	port::out<u8>(1, 2);
 
-	charpos(4, 0);
-	putstrc("Hello, World!", COLOR_H|COLOR_R|COLOR_G | COLOR_BG(COLOR_B));
-	puthex32(0x12345678);
-	puthex16(0x9abc);
-	puthex8(0xde);
-	puthex8(0xF);
-*/
+	screen::cursor(4);
+	screen::put("Hello, World!",
+			screen::color::make(
+				screen::color::rgbh(1, 1, 0, 1),
+				screen::color::rgbh(0, 0, 1, 0)));
+
+	screen::puthexf<u32>(0x12345678);
+	screen::puthexf<u16>(0x9abc);
+	screen::puthexf<u8>(0xde);
+	screen::puthexf<u8>(0xF);	// use upper case F to test...... LOL
 }
 
