@@ -1,6 +1,6 @@
 CC = g++
 LD = ld
-CCFLAGS = -m32 -Wall -O0 -std=gnu++11 -nostdinc -nostdlib -ffreestanding
+CCFLAGS = -m32 -Wall -O0 -std=gnu++11 -nostdinc -nostdlib -ffreestanding -fno-exceptions -fno-rtti
 LDFLAGS = -melf_i386 -Ttext=0
 SRC = $(wildcard *.cc)
 OBJ = $(SRC:.cc=.o)

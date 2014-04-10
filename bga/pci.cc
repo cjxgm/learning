@@ -1,30 +1,44 @@
 #include "pci.hh"
 #include "port.hh"
 
-
 namespace kernel
 {
 	namespace pci
 	{
+		namespace config
+		{
+			constexpr static u16 addr = 0xCF8;
+			constexpr static u16 data = 0xCFC;
+		};
+
+		namespace address
+		{
+			union Type
+			{
+				struct Detail {
+					u8 _0   : 2;	// always 0
+					u8 reg  : 6;	// register
+					u8 func : 3;	// function
+					u8 dev  : 5;	// device
+					u8 bus  : 8;	// bus
+					u8 _1   : 7;	// reserved
+					u8 _2   : 1;	// enable (should be 1)
+				} PACKED;
+				Detail detail;
+				u32 bits;
+			};
+
+			constexpr static u32 make(u8 bus, u8 dev, u8 func, u8 reg)
+			{
+				return (Type {
+							.detail = { 0, reg, func, dev, bus, 0, 1 }
+						}).bits;
+			}
+		};
+
 		u16 read(u8 bus, u8 dev, u8 func, u8 reg)
 		{
-			// -------- addr --------
-			//
-			// 00-01  2    (=0)
-			// 02-07  6    register
-			// 08-10  3    function
-			// 11-15  5    device
-			// 16-23  8    bus
-			// 24-30  7    RESERVED
-			// 31-31  1    enable (=1)
-			//
-			u32 addr =  ((reg  & 0b111111) << 2 ) |
-						((func & 0b111   ) << 8 ) |
-						((dev  & 0b11111 ) << 11) |
-						( bus              << 16) |
-						( 1                << 31);
-			port::out<u32>(config::addr, addr);
-
+			port::out(config::addr, address::make(bus, dev, func, reg));
 			// ((reg & 0b10) << 3) will choose the first 16-bit.
 			return port::in<u32>(config::data) >> ((reg & 0b10) << 3);
 		}
