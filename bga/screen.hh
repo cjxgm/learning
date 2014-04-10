@@ -19,6 +19,8 @@ namespace kernel
 			static constexpr Type hwhite  = rgbh(1, 1, 1, 1);
 			static constexpr Type  yellow = rgbh(1, 1, 0, 0);
 			static constexpr Type hyellow = rgbh(1, 1, 0, 1);
+			static constexpr Type  green  = rgbh(0, 1, 0, 0);
+			static constexpr Type hgreen  = rgbh(0, 1, 0, 1);
 
 			constexpr Type make(Type fg, Type bg = black)
 			{
@@ -30,6 +32,8 @@ namespace kernel
 		void cursor(int y=0, int x=0);
 		void put(u8 ch, color::Type color = color::white);
 		void put(const char* s, color::Type color = color::white);
+		void putnum(int num, color::Type color = color::hgreen);
+		void putnum(u32 num, color::Type color = color::hgreen);
 
 		template <class T>
 		void puthex(T hex, color::Type color = color::hyellow)

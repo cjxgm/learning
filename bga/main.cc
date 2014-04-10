@@ -6,8 +6,11 @@
 
 void kernel::main()
 {
-	screen::cursor(1, 1);
-	screen::put('a');
+	screen::cursor(1, 8);
+	screen::put("detected bga version: ", screen::color::green);
+	int ver = driver::video::bga::version();
+	if (ver < 0) screen::put("no", screen::color::hgreen);
+	else screen::putnum(ver);
 
 	screen::cursor(0, 0);
 	screen::put(port::in<u8>(1) + 'a', screen::color::rgbh(1, 0, 0));
@@ -37,9 +40,5 @@ void kernel::main()
 			screen::puthexf(vendor);
 			screen::put("    ");
 		}
-
-	// check for bga
-	screen::cursor(2);
-	screen::puthexf<u32>(driver::video::bga::version());
 }
 

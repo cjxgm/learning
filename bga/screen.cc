@@ -27,6 +27,28 @@ namespace kernel
 		{
 			while (*s) put(*s++, color);
 		}
+
+		void putnum(int num, color::Type color)
+		{
+			if (num < 0) {
+				put('-', color);
+				num = -num;
+			}
+			putnum(u32(num), color);
+		}
+
+		void putnum(u32 num, color::Type color)
+		{
+			if (!num) {
+				put('0', color);
+				return;
+			}
+			char buf[16];
+			char* p = &buf[15];
+			for (*p--=0; num; num/=10)
+				*p-- = '0' + num%10;
+			put(++p, color);
+		}
 	};
 };
 
