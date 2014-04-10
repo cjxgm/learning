@@ -7,8 +7,8 @@ namespace kernel
 	{
 		namespace config
 		{
-			constexpr static u16 addr = 0xCF8;
-			constexpr static u16 data = 0xCFC;
+			constexpr static u16 addr = 0xcf8;
+			constexpr static u16 data = 0xcfc;
 		};
 
 		namespace address

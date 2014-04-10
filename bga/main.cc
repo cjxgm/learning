@@ -2,6 +2,7 @@
 #include "screen.hh"
 #include "port.hh"
 #include "pci.hh"
+#include "bga.hh"
 
 void kernel::main()
 {
@@ -36,5 +37,9 @@ void kernel::main()
 			screen::puthexf(vendor);
 			screen::put("    ");
 		}
+
+	// check for bga
+	screen::cursor(2);
+	screen::puthexf<u32>(driver::video::bga::version());
 }
 
