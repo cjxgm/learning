@@ -32,15 +32,15 @@ namespace kernel
 		void cursor(int y=0, int x=0);
 
 
-		template <int B, class T>
-		void put(T data)
+		// when a base/type combination is not specialized,
+		// throw a compile-time error.
+		template <int B, class T, class... A>	// B for base
+		void put(T data, A...)
 		{
 			T    unimplemented    [B?-1:-1];
 		}
-		template <int B, class T, class X>
-		void put(T data, X x) { put<B>(data); }
-		template <int B, class T, class X, class Y>
-		void put(T data, X x, Y y) { put<B>(data); }
+
+		// base 10 (decimal) specializations
 
 		template <>
 		void put<10>(char ch, color::Type color);
@@ -62,6 +62,7 @@ namespace kernel
 		template <>
 		inline void put<10>(u32 num) { put<10>(num, color::hgreen); }
 
+		// base 16 (hexadecimal) specializations
 
 		template <>
 		void put<16>(u32 hex, int size, color::Type color);
@@ -79,6 +80,7 @@ namespace kernel
 		inline void put<16>(u32 hex) { put<16>(hex, color::hyellow); }
 
 
+		// default to base 10 (decimal)
 		template <class T>
 		void put(T data) { put<10>(data); }
 		template <class T>
