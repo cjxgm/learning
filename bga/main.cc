@@ -22,12 +22,10 @@ void kernel::main()
 				screen::color::rgbh(1, 1, 0, 1),
 				screen::color::rgbh(0, 0, 1, 0)));
 
-/*
 	screen::put<16,u32>(0x12345678);
 	screen::put<16,u16>(0x9abc);
 	screen::put<16,u8 >(0xde);
 	screen::put<16,u8 >(0xF);	// use upper case F to test...... LOL
-*/
 
 	// scan the pci
 	screen::cursor(5);
@@ -35,11 +33,11 @@ void kernel::main()
 		for (u8 dev=0; dev<0b100000; dev++) {
 			u16 vendor = pci::read(bus, dev, 0, 0);
 			if (vendor == 0xffff) continue;
-			//screen::puthexf<u8>(bus);
+			screen::put<16,u8>(bus);
 			screen::put(':');
-			//screen::puthexf(dev);
+			screen::put<16>(dev);
 			screen::put(' ');
-			//screen::puthexf(vendor);
+			screen::put<16>(vendor);
 			screen::put("    ");
 		}
 }

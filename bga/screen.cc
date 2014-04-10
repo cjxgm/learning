@@ -53,6 +53,14 @@ namespace kernel
 				*p-- = '0' + num%10;
 			put((const char*)(++p), color);
 		}
+
+		template <>
+		void put<16>(u32 hex, int size, color::Type color)
+		{
+			constexpr const char* digits = "0123456789abcdef";
+			for (int i=(size<<1)-1; i>=0; i--)
+				put(char(digits[(hex >> (i<<2)) & 0xF]), color);
+		}
 	};
 };
 
