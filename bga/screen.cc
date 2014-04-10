@@ -18,26 +18,30 @@ namespace kernel
 			current = &text[y*80 + x];
 		}
 
-		void put(u8 ch, color::Type color)
+		template <>
+		void put<10>(char ch, color::Type color)
 		{
-			*current++ = Glyph { ch, color };
+			*current++ = Glyph { u8(ch), color };
 		}
 
-		void put(const char* s, color::Type color)
+		template <>
+		void put<10>(const char* s, color::Type color)
 		{
 			while (*s) put(*s++, color);
 		}
 
-		void putnum(int num, color::Type color)
+		template <>
+		void put<10>(int num, color::Type color)
 		{
 			if (num < 0) {
 				put('-', color);
 				num = -num;
 			}
-			putnum(u32(num), color);
+			put(u32(num), color);
 		}
 
-		void putnum(u32 num, color::Type color)
+		template <>
+		void put<10>(u32 num, color::Type color)
 		{
 			if (!num) {
 				put('0', color);
@@ -47,7 +51,7 @@ namespace kernel
 			char* p = &buf[15];
 			for (*p--=0; num; num/=10)
 				*p-- = '0' + num%10;
-			put(++p, color);
+			put((const char*)(++p), color);
 		}
 	};
 };

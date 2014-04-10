@@ -30,25 +30,72 @@ namespace kernel
 
 
 		void cursor(int y=0, int x=0);
-		void put(u8 ch, color::Type color = color::white);
-		void put(const char* s, color::Type color = color::white);
-		void putnum(int num, color::Type color = color::hgreen);
-		void putnum(u32 num, color::Type color = color::hgreen);
+
+
+		template <int B, class T>
+		void put(T data)
+		{
+			T unimplemented [B?-1:-1];
+		}
+		template <int B, class T, class X>
+		void put(T data, X x) { put<B>(data); }
+		template <int B, class T, class X, class Y>
+		void put(T data, X x, Y y) { put<B>(data); }
+
+		template <>
+		void put<10>(char ch, color::Type color);
+		template <>
+		inline void put<10>(char ch) { put<10>(ch, color::white); }
+
+		template <>
+		void put<10>(const char* s, color::Type color);
+		template <>
+		inline void put<10>(const char* s) { put<10>(s, color::white); }
+
+		template <>
+		void put<10>(int num, color::Type color);
+		template <>
+		inline void put<10>(int num) { put<10>(num, color::hgreen); }
+
+		template <>
+		void put<10>(u32 num, color::Type color);
+		template <>
+		inline void put<10>(u32 num) { put<10>(num, color::hgreen); }
+
 
 		template <class T>
-		void puthex(T hex, color::Type color = color::hyellow)
+		struct put16_allowed
+		{
+			put16_allowed() = delete;
+		};
+		template <> struct put16_allowed<u8 > {};
+		template <> struct put16_allowed<u16> {};
+		template <> struct put16_allowed<u32> {};
+
+/*
+		template <class T>
+		void put<16>(T hex, color::Type color = color::hyellow, put16_allowed<T>)
 		{
 			constexpr const char* digits = "0123456789abcdef";
 			for (int i=(sizeof(T)<<1)-1; i>=0; i--)
 				put(digits[(hex >> (i<<2)) & 0xF], color);
 		}
+		template <class T>
+		inline void put<16>(T hex, color::Type color)
+		{
+			put<16>(hex, color, put16_allowed<T>{});
+		}
+		template <class T>
+		inline void put<16>(T hex)
+		{
+			put<16>(hex, color::hyellow);
+		}
+*/
 
 		template <class T>
-		void puthexf(T hex)
-		{
-			put("0x", color::yellow);
-			puthex(hex);
-		}
+		void put(T data) { put<10>(data); }
+		template <class T>
+		void put(T data, color::Type color) { put<10>(data, color); }
 	};
 };
 
