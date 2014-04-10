@@ -7,7 +7,7 @@ OBJ = $(SRC:.cc=.o)
 
 all: kernel
 test: kernel
-	qemu-system-i386 -kernel kernel -vga cirrus
+	qemu-system-i386 -kernel kernel -vga std
 clean:
 	rm -f *.o
 cleanall: clean
