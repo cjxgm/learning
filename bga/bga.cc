@@ -46,19 +46,33 @@ namespace kernel
 
 		void enable(bool yes)
 		{
-			bga::out(index::enable, yes);
+			bga::out(index::enable, yes | 0x40);
 		}
 
-		bool mode(u16 xres, u16 yres, u16 bpp)
+		bool mode(u16 xres, u16 yres)
 		{
+			return true;
 			bga::enable(false);
 			bga::out(index::xres, xres);
 			bga::out(index::yres, yres);
-			bga::out(index::bpp , bpp );
+			bga::out(index::bpp , 24  );
 			bga::enable();
 			return (bga::in(index::xres) != xres ||
 					bga::in(index::yres) != yres ||
-					bga::in(index::bpp ) != bpp);
+					bga::in(index::bpp ) != 24);
+		}
+
+		void test(u16 xres, u16 yres)
+		{
+			struct BGR
+			{
+				u8 b;
+				u8 g;
+				u8 r;
+			} PACKED;
+			BGR* fb = (BGR*) 0xfebf0000;
+			for (int i=0; i<int(xres*yres); i++)
+				fb[i].g = 127;
 		}
 	};};};
 };

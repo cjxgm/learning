@@ -36,11 +36,19 @@ namespace kernel
 			}
 		};
 
-		u16 read(u8 bus, u8 dev, u8 func, u8 reg)
+		u32 read(u8 bus, u8 dev, u8 func, u8 reg)
 		{
 			port::out(config::addr, address::make(bus, dev, func, reg));
-			// FIXME: why? ((reg & 0b10) << 3) will choose the correct 16-bit.
-			return port::in<u32>(config::data) >> ((reg & 0b10) << 3);
+			return port::in<u32>(config::data);
+		}
+
+		bool device(DeviceRaw& raw, u8 bus, u8 dev, u8 func)
+		{
+			raw[0] = read(bus, dev, func, 0);
+			if (raw[0] == 0xffffffff) return true;
+			for (int i=1; i<256/4; i++)
+				raw[i] = read(bus, dev, func, i);
+			return false;
 		}
 	};
 };
