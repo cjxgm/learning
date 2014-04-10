@@ -21,6 +21,9 @@ namespace kernel
 			static constexpr Type hyellow = rgbh(1, 1, 0, 1);
 			static constexpr Type  green  = rgbh(0, 1, 0, 0);
 			static constexpr Type hgreen  = rgbh(0, 1, 0, 1);
+			static constexpr Type  red    = rgbh(1, 0, 0, 0);
+			static constexpr Type hred    = rgbh(1, 0, 0, 1);
+
 
 			constexpr Type make(Type fg, Type bg = black)
 			{

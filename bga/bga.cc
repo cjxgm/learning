@@ -48,6 +48,18 @@ namespace kernel
 		{
 			bga::out(index::enable, yes);
 		}
+
+		bool mode(u16 xres, u16 yres, u16 bpp)
+		{
+			bga::enable(false);
+			bga::out(index::xres, xres);
+			bga::out(index::yres, yres);
+			bga::out(index::bpp , bpp );
+			bga::enable();
+			return (bga::in(index::xres) != xres ||
+					bga::in(index::yres) != yres ||
+					bga::in(index::bpp ) != bpp);
+		}
 	};};};
 };
 

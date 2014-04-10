@@ -14,6 +14,11 @@ void kernel::main()
 	if (ver < 0) screen::put("no", screen::color::hgreen);
 	else screen::put(ver);
 
+	// setup video mode
+	if (driver::video::bga::mode(800, 600, 24))
+		screen::put("    mode-setting failed.", screen::color::hred);
+
+
 	screen::cursor(0, 4);
 	screen::put(port::in<u8>(1) + 'a', screen::color::rgbh(1, 0, 0));
 	port::out<u8>(1, 2);
@@ -43,6 +48,7 @@ void kernel::main()
 			screen::put("    ");
 		}
 
+	// print line numbers
 	for (int y=1; y<=25; y++) {
 		screen::cursor(y-1);
 		screen::put(' ');
