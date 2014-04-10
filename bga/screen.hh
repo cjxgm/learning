@@ -82,9 +82,9 @@ namespace kernel
 
 		// default to base 10 (decimal)
 		template <class T>
-		void put(T data) { put<10>(data); }
+		static inline void put(T data) { put<10>(data); }
 		template <class T>
-		void put(T data, color::Type color) { put<10>(data, color); }
+		static inline void put(T data, color::Type color) { put<10>(data, color); }
 	};
 };
 
