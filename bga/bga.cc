@@ -46,12 +46,12 @@ namespace kernel
 
 		void enable(bool yes)
 		{
-			bga::out(index::enable, yes | 0x40);
+			bga::out(index::enable, (yes ? 0x41 : 0));
 		}
 
 		bool mode(u16 xres, u16 yres)
 		{
-			return true;
+			//return true;
 			bga::enable(false);
 			bga::out(index::xres, xres);
 			bga::out(index::yres, yres);
@@ -70,7 +70,7 @@ namespace kernel
 				u8 g;
 				u8 r;
 			} PACKED;
-			BGR* fb = (BGR*) 0xfebf0000;
+			BGR* fb = (BGR*) 0xfd000008;
 			for (int i=0; i<int(xres*yres); i++)
 				fb[i].g = 127;
 		}

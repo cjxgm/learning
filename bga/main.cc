@@ -50,16 +50,11 @@ void kernel::main()
 					screen::put(':');
 				}
 				u8* xxx = (u8*)raw[4];
-				*xxx = 255;
-				/*
-				if (vendor == 0xffff) continue;
-				screen::put<16,u8>(bus);
-				screen::put(':');
-				screen::put<16>(dev);
-				screen::put(' ');
-				screen::put<16>(vendor);
-				screen::put("    ");
-				*/
+				xxx[0] = 127;
+				xxx[1] = 127;
+				xxx[3] = 127;
+				xxx[8] = 127;
+				xxx[80] = 127;
 			}
 
 	// print line numbers
