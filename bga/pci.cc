@@ -1,5 +1,6 @@
 #include "pci.hh"
 #include "port.hh"
+#include "screen.hh"
 
 namespace kernel
 {
@@ -39,7 +40,7 @@ namespace kernel
 		u16 read(u8 bus, u8 dev, u8 func, u8 reg)
 		{
 			port::out(config::addr, address::make(bus, dev, func, reg));
-			// ((reg & 0b10) << 3) will choose the first 16-bit.
+			// ((reg & 0b10) << 3) will choose the correct 16-bit.
 			return port::in<u32>(config::data) >> ((reg & 0b10) << 3);
 		}
 	};
