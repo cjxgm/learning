@@ -6,17 +6,19 @@
 
 void kernel::main()
 {
+	screen::clear();
+
 	screen::cursor(1, 8);
 	screen::put("detected bga version: ", screen::color::green);
 	int ver = driver::video::bga::version();
 	if (ver < 0) screen::put("no", screen::color::hgreen);
 	else screen::put(ver);
 
-	screen::cursor(0, 0);
+	screen::cursor(0, 4);
 	screen::put(port::in<u8>(1) + 'a', screen::color::rgbh(1, 0, 0));
 	port::out<u8>(1, 2);
 
-	screen::cursor(4);
+	screen::cursor(3, 12);
 	screen::put("Hello, World!",
 			screen::color::make(
 				screen::color::rgbh(1, 1, 0, 1),
@@ -28,7 +30,7 @@ void kernel::main()
 	screen::put<16,u8 >(0xF);	// use upper case F to test...... LOL
 
 	// scan the pci
-	screen::cursor(5);
+	screen::cursor(5, 4);
 	for (u16 bus=0; bus<0x100; bus++)
 		for (u8 dev=0; dev<0b100000; dev++) {
 			u16 vendor = pci::read(bus, dev, 0, 0);
@@ -40,5 +42,13 @@ void kernel::main()
 			screen::put<16>(vendor);
 			screen::put("    ");
 		}
+
+	for (int y=1; y<=25; y++) {
+		screen::cursor(y-1);
+		screen::put(' ');
+		if (y<10) screen::put(' ');
+		screen::put(y, screen::color::yellow);
+		screen::put(' ');
+	}
 }
 

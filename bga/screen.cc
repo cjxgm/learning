@@ -18,6 +18,13 @@ namespace kernel
 			current = &text[y*80 + x];
 		}
 
+		void clear()
+		{
+			cursor(0, 0);
+			for (int i=0; i<80*25; i++)
+				put(' ');
+		}
+
 		template <>
 		void put<10>(char ch, color::Type color)
 		{

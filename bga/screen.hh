@@ -30,6 +30,7 @@ namespace kernel
 
 
 		void cursor(int y=0, int x=0);
+		void clear();
 
 
 		// when a base/type combination is not specialized,
