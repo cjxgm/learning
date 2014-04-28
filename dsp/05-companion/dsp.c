@@ -21,7 +21,7 @@ void chord(size_t frame, uint8_t op, int id, uint8_t vol, int lower)
 		48, 52, 55,		// 3	1 3 5
 		47, 50, 55,		// 4	-7 2 5
 		 0,  0,  0,		// 4#  TODO
-		47, 50, 55,		// 5	-7 2 5
+		48, 52, 55,		// 5	1 3 5
 		 0,  0,  0,		// 5#  TODO
 		48, 53, 57,		// 6	1 4 6
 		 0,  0,  0,		// 6#  TODO
@@ -41,14 +41,17 @@ void process_midi(size_t frame, uint8_t ev[3])
 
 	if (ev[0] == 0x90 || ev[0] == 0x80)	{ //  preseed or released
 		if (ev[1] >= 48 && ev[1] <= 59) {
-			if (ev[0] == 0x80 && !nnote) {}
-			else {
-				if (ev[0] == 0x90 && !nnote)
-					chord(frame, 0x80, ev[1]-48, 0, 1);
-				chord(frame, ev[0], ev[1]-48, ev[2]*volume, !nnote);
-			}
+			if (nloop) {
+				if (ev[0] == 0x80 && !nnote) {}
+				else {
+					if (ev[0] == 0x90 && !nnote)
+						chord(frame, 0x80, ev[1]-48, 0, 1);
+					chord(frame, ev[0], ev[1]-48, ev[2]*volume, !nnote);
+				}
 
-			if (ev[0] == 0x80) nnote = (nnote+1) % nloop;
+				if (ev[0] == 0x80) nnote = (nnote+1) % nloop;
+			}
+			else chord(frame, ev[0], ev[1]-48, ev[2]*volume, 0);
 		}
 		else midi_write(frame, ev);
 		return;
@@ -67,7 +70,9 @@ void process_midi(size_t frame, uint8_t ev[3])
 	if (ev[0] == 0xb0 && ev[1] == 0x7e) {	// controller no. 126
 		nloop = ev[2];
 		nnote = 0;
-		printf("loop = %d\n", nloop);
+		printf("loop = %d", nloop);
+		if (!nloop) printf("    no emphasis");
+		putchar('\n');
 		return;
 	}
 }
