@@ -44,6 +44,8 @@ void process_midi(size_t frame, uint8_t ev[3])
 		synth_add(ev[1], note_duration, ev[2] / 127.0f);
 		printf("note = %2.2x    vol %2.2f\n", ev[1], ev[2] / 127.0f);
 	}
+//	else printf("unknown: %2.2x: %2.2x(% 3d) %2.2x(% 3d)\n",
+//			ev[0], ev[1], ev[1], ev[2], ev[2]);
 }
 
 static const float zero = 0.001;
