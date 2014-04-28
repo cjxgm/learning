@@ -28,7 +28,8 @@ void synth_add(uint8_t midi_note, float duration, float velocity)
 	float freq = 440.0f * powf(2.0f, (midi_note - 69) / 12.0f);
 	size_t len = roundf(duration * srate);
 	float* buf = track_new_for_buf(len);
-	synthesis(buf, len, freq, velocity);
+	float offset = (rand() & 0xFF) / 255.0f;
+	synthesis(buf, len, freq, velocity, offset);
 }
 
 void synth_fill(float* out, size_t nframe)

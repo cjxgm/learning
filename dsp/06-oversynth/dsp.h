@@ -5,5 +5,5 @@
 
 void process_wave(float* out, float* in, size_t nframe);
 void process_midi(size_t frame, uint8_t ev[3]);
-void synthesis(float* out, size_t nframe, float freq, float velocity);
+void synthesis(float* out, size_t nframe, float freq, float velocity, float offset);
 
