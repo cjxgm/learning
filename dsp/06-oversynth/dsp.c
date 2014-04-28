@@ -4,7 +4,6 @@
 #include "synth.h"
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 static float alpha = 0.80f;
 static float comp_alpha = 1.0f - 0.80;
@@ -46,26 +45,33 @@ void process_midi(size_t frame, uint8_t ev[3])
 	}
 }
 
-static float unirand()
-{
-	return 2.0f * (rand() & 0xFFFF) / 0xFFFF - 1.0f;
-}
 static const float zero = 0.001;
 void synthesis(float* out, size_t nframe, float freq, float velocity)
 {
 	// 1 + log_a(nframe+1) = zero  <=>  ln(a) = ln(nframe+1)/(zero-1)
 	// and in C, log is base-e logarithm
 	float loga = logf(nframe+1.0f) / (zero-1.0f);
-	int sfreq = srate / freq;
 
-	float noise[sfreq];
-	for (int i=0; i<sfreq; i++) noise[i] = unirand();
+	float func(int i, float freq, float offset)
+	{
+		int sfreq = srate / freq;
+		i = (int)(i+offset*sfreq) % sfreq;
+		if (i < sfreq/2) return 1;
+		return -1;
+	}
 
-	for (int i=0; i<nframe; i++) {
+	void overtune(int i, float freq, float velocity, float offset)
+	{
+		if (velocity < zero) return;
+		*out += func(i, freq, offset)*velocity;
+		overtune(i, freq*2.000000f, velocity*0.10, 0.30); // higher do
+		overtune(i, freq*1.498307f, velocity*0.20, 0.70); // sol: 2^(7/12)
+		overtune(i, freq*1.259921f, velocity*0.12, 0.11); // mi : 2^(1/3)
+	}
+
+	for (int i=0; i<nframe; i++,out++) {
 		float gain = 1 + log(i+1) / loga;
-		int m = i % sfreq;
-		//*out++ = (2.0f * m / sfreq - 1.0f) * gain*velocity;
-		*out++ = noise[m] * gain*velocity;
+		overtune(i, freq, gain*velocity, 0);
 	}
 }
 
