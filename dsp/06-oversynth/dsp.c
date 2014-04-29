@@ -15,6 +15,11 @@ static void dsp_zero(float* out, size_t nframe);
 static void dsp_mix(float* out, float* in, size_t nframe);
 static void dsp_lowpass(float* out, float* in, size_t nframe);
 
+typedef float Sound(int i, float freq, float offset);
+// if id<0 then return the selected sound function
+// otherwise, select the sound specified by id;
+static Sound* sound_select(int id);
+
 
 void process_wave(float* out, float* in, size_t nframe)
 {
@@ -40,9 +45,11 @@ void process_midi(size_t frame, uint8_t ev[3])
 		note_duration = ev[2] / 31.0f;
 		printf("len = %2.2f\n", note_duration);
 	}
-	else if (ev[0] == 0x90) {						// note on in channel 0
+	else if (ev[0] >= 0x90 && ev[0] <= 0xa0) {		// note on in channel 0
+		sound_select(ev[0] - 0x90);
 		synth_add(ev[1], note_duration, ev[2] / 127.0f);
-		printf("note = %2.2x    vol %2.2f\n", ev[1], ev[2] / 127.0f);
+		printf("note = %2.2x    vol %2.2f    sound %x\n",
+				ev[1], ev[2] / 127.0f, ev[0]-0x90);
 	}
 //	else printf("unknown: %2.2x: %2.2x(% 3d) %2.2x(% 3d)\n",
 //			ev[0], ev[1], ev[1], ev[2], ev[2]);
@@ -65,8 +72,8 @@ void synthesis(float* out, size_t nframe, float freq, float velocity, float offs
 
 	void overtune(int i, float freq, float velocity, float offset)
 	{
-		if (velocity < zero) return;
-		*out += func(i, freq, offset)*velocity;
+		if (velocity < 0.01f) return;
+		*out += sound_select(-1)(i, freq, offset)*velocity;
 		overtune(i, freq*2.000000f, velocity*0.10, 0.30); // +do: 2^(12/12)
 		overtune(i, freq*1.498307f, velocity*0.19, 0.70); // sol: 2^( 7/12)
 		overtune(i, freq*1.259921f, velocity*0.13, 0.11); // mi : 2^( 4/12)
@@ -99,5 +106,44 @@ static void dsp_mix(float* out, float* in, size_t nframe)
 static void dsp_zero(float* out, size_t nframe)
 {
 	memset(out, 0, sizeof(*out)*nframe);
+}
+
+
+
+
+static float sound_sqr(int i, float freq, float offset)
+{
+	int sfreq = srate / freq;
+	i = (int)(i+offset*sfreq) % sfreq;
+	if (i < sfreq/2) return 1;
+	return -1;
+}
+
+static float sound_saw(int i, float freq, float offset)
+{
+	int sfreq = srate / freq;
+	i = (int)(i+offset*sfreq) % sfreq;
+	return 2.0f * i / sfreq - 1.0f;
+}
+
+static float sound_sin(int i, float freq, float offset)
+{
+	return sin(2*M_PI*(freq/srate*i + offset));
+}
+
+static Sound* sound_select(int id)
+{
+	static Sound* sounds[] = {
+		&sound_sqr,
+		&sound_saw,
+		&sound_sin,
+	};
+	static Sound* current = &sound_sqr;
+
+	if (id < 0) return current;
+
+	const int nsound = sizeof(sounds)/sizeof(sounds[0]);
+	current = sounds[id % nsound];
+	return current;
 }
 
