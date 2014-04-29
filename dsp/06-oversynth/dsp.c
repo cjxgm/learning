@@ -70,20 +70,20 @@ void synthesis(float* out, size_t nframe, float freq, float velocity, float offs
 		return -1;
 	}
 
-	void overtune(int i, float freq, float velocity, float offset)
+	void overtone(int i, float freq, float velocity, float offset)
 	{
 		if (velocity < 0.01f) return;
 		*out += sound_select(-1)(i, freq, offset)*velocity;
-		overtune(i, freq*2.000000f, velocity*0.10, 0.30); // +do: 2^(12/12)
-		overtune(i, freq*1.498307f, velocity*0.19, 0.70); // sol: 2^( 7/12)
-		overtune(i, freq*1.259921f, velocity*0.13, 0.11); // mi : 2^( 4/12)
-		overtune(i, freq/1.498307f, velocity*0.11, 0.37); // -fa: 2^(-7/12)
-		overtune(i, freq/2.000000f, velocity*0.07, 0.43); // -do: 2^(12/12)
+		overtone(i, freq*2.000000f, velocity*0.10, 0.30); // +do: 2^(12/12)
+		overtone(i, freq*1.498307f, velocity*0.19, 0.70); // sol: 2^( 7/12)
+		overtone(i, freq*1.259921f, velocity*0.13, 0.11); // mi : 2^( 4/12)
+		overtone(i, freq/1.498307f, velocity*0.11, 0.37); // -fa: 2^(-7/12)
+		overtone(i, freq/2.000000f, velocity*0.07, 0.43); // -do: 2^(12/12)
 	}
 
 	for (int i=0; i<nframe; i++,out++) {
 		float gain = 1 + log(i+1) / loga;
-		overtune(i, freq, gain*velocity, offset);
+		overtone(i, freq, gain*velocity, offset);
 	}
 }
 
