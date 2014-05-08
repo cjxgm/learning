@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+use Fuse;
+use FillStat;
+use POSIX;
+
+
+#cat ... | curl -F 'name=@-;type=image/*' img.vim-cn.com
+
+exit 1 unless @ARGV;
+print "mounting to $ARGV[0]...\n";
+
+my %files = (
+	aaa => 'dir',
+	bbb => 'dir',
+	ccc => 'reg',
+	ddd => 'dir',
+	eee => 'reg',
+);
+
+sub getdir
+{
+	return keys(%files), 0;
+}
+
+
+
+sub getattr
+{
+	my ($file) = @_;
+	return &fill_stat(type => 'dir', mode => 0755) if $file eq '/';
+
+	$file =~ s|^/||;
+	return -ENOENT() unless exists $files{$file};
+
+	&fill_stat(mode => 0644);
+}
+
+sub create
+{
+	my ($file) = @_;
+
+	$file =~ s|^/||;
+	return -EINVAL() if $file =~ m|/|;
+
+	$files{$file} = '';
+	0;	# TODO: return file handle?
+}
+
+
+Fuse::main(
+		mountpoint => $ARGV[0],
+		getattr => \&getattr,
+		getdir => \&getdir,
+		create => \&create,
+);
+

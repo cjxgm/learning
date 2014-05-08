@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use Fuse;
+use Fcntl ':mode';
+
+#my @s=stat "/etc/services";
+#print "@s";
+#exit 0;
+
+exit 1 unless @ARGV;
+print "mounting to $ARGV[0]...";
+
+Fuse::main(
+		mountpoint => $ARGV[0],
+		getattr => \&getattr,
+		getdir => \&getdir,
+);
+
+sub getdir
+{
+	print "getdir: @_\n";
+	return qw(Hi Fuckers), 0;
+}
+
+sub getattr
+{
+	print "getattr: @_\n";
+	my $mode = 0766|S_IFREG;
+	$mode = 0755|S_IFDIR if $_[0] eq '/Hi';
+	return (1, 1, $mode, 1, 0, 0, 0, 0, 0, 0, 0, 4096, 512);
+}
+
+
