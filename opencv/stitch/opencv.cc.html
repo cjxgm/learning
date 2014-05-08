@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/project/code/learning/opencv/stitch/opencv.cc.html</title>
+<meta name="Generator" content="Vim/7.4">
+<meta name="plugin-version" content="vim7.4_v1">
+<meta name="syntax" content="cpp">
+<meta name="settings" content="number_lines,ignore_folding,use_css,no_foldcolumn,expand_tabs,line_ids,prevent_copy=">
+<meta name="colorscheme" content="torte">
+<style type="text/css">
+<!--
+pre { font-size: 12pt; padding: 0.5em; font-family: monospace; color: #cccccc; background-color: #000000; }
+* { font-size: 1em; }
+.Type { color: #60ff60; }
+.Statement { color: #ffff00; }
+.LineNr { color: #ffff00; }
+.PreProc { color: #ff80ff; }
+.Constant { color: #ffa0a0; }
+.Special { color: #ffa500; }
+.Identifier { color: #40ffff; }
+.Comment { color: #80a0ff; }
+-->
+</style>
+
+<script type='text/javascript'>
+<!--
+
+/* function to open any folds containing a jumped-to line before jumping to it */
+function JumpToLine()
+{
+  var lineNum;
+  lineNum = window.location.hash;
+  lineNum = lineNum.substr(1); /* strip off '#' */
+
+  if (lineNum.indexOf('L') == -1) {
+    lineNum = 'L'+lineNum;
+  }
+  lineElem = document.getElementById(lineNum);
+  /* Always jump to new location even if the line was hidden inside a fold, or
+   * we corrected the raw number to a line ID.
+   */
+  if (lineElem) {
+    lineElem.scrollIntoView(true);
+  }
+  return true;
+}
+if ('onhashchange' in window) {
+  window.onhashchange = JumpToLine;
+}
+
+-->
+</script>
+</head>
+<body onload='JumpToLine();'>
+<pre id='vimCodeElement'>
+<span id="L1" class="LineNr"> 1 </span><span class="PreProc">#include </span><span class="Constant">&lt;iostream&gt;</span>
+<span id="L2" class="LineNr"> 2 </span><span class="PreProc">#include </span><span class="Constant">&lt;fstream&gt;</span>
+<span id="L3" class="LineNr"> 3 </span><span class="PreProc">#include </span><span class="Constant">&lt;vector&gt;</span>
+<span id="L4" class="LineNr"> 4 </span><span class="PreProc">#include </span><span class="Constant">&lt;opencv2/opencv.hpp&gt;</span>
+<span id="L5" class="LineNr"> 5 </span><span class="PreProc">#include </span><span class="Constant">&lt;opencv2/stitching/stitcher.hpp&gt;</span>
+<span id="L6" class="LineNr"> 6 </span>
+<span id="L7" class="LineNr"> 7 </span><span class="Statement">using</span> <span class="Type">namespace</span> std;
+<span id="L8" class="LineNr"> 8 </span><span class="Statement">using</span> <span class="Type">namespace</span> cv;
+<span id="L9" class="LineNr"> 9 </span>
+<span id="L10" class="LineNr">10 </span><span class="Type">bool</span> <span class="Identifier">exist</span>(<span class="Type">const</span> <span class="Type">string</span>&amp; path)
+<span id="L11" class="LineNr">11 </span>{
+<span id="L12" class="LineNr">12 </span>    ifstream f{path};
+<span id="L13" class="LineNr">13 </span>    <span class="Statement">return</span> f.<span class="Identifier">good</span>();
+<span id="L14" class="LineNr">14 </span>}
+<span id="L15" class="LineNr">15 </span>
+<span id="L16" class="LineNr">16 </span>
+<span id="L17" class="LineNr">17 </span><span class="Type">int</span> <span class="Identifier">main</span>()
+<span id="L18" class="LineNr">18 </span>{
+<span id="L19" class="LineNr">19 </span>    <span class="Type">vector&lt;Mat&gt;</span> imgs;
+<span id="L20" class="LineNr">20 </span>
+<span id="L21" class="LineNr">21 </span>    <span class="Comment">// load files</span>
+<span id="L22" class="LineNr">22 </span>    <span class="Type">string</span> basename{<span class="Constant">&quot;imgs/&quot;</span>};
+<span id="L23" class="LineNr">23 </span>    <span class="Type">string</span> suffix{<span class="Constant">&quot;.jpg&quot;</span>};
+<span id="L24" class="LineNr">24 </span>    <span class="Statement">for</span> (<span class="Type">int</span> i=<span class="Constant">0</span>;; i++) {
+<span id="L25" class="LineNr">25 </span>        <span class="Type">string</span> filename = basename + <span class="Identifier">to_string</span>(i) + suffix;
+<span id="L26" class="LineNr">26 </span>        <span class="Statement">if</span> (!<span class="Identifier">exist</span>(filename)) <span class="Statement">break</span>;
+<span id="L27" class="LineNr">27 </span>        (cout &lt;&lt; <span class="Constant">&quot;loading &quot;</span> &lt;&lt; filename &lt;&lt; <span class="Constant">&quot;...&quot;</span>).<span class="Identifier">flush</span>();
+<span id="L28" class="LineNr">28 </span>        imgs.<span class="Identifier">push_back</span>(<span class="Identifier">imread</span>(filename));
+<span id="L29" class="LineNr">29 </span>        cout &lt;&lt; <span class="Constant">&quot;</span><span class="Special">\t</span><span class="Constant">OK&quot;</span> &lt;&lt; endl;
+<span id="L30" class="LineNr">30 </span>    }
+<span id="L31" class="LineNr">31 </span>
+<span id="L32" class="LineNr">32 </span>    <span class="Comment">// stitch</span>
+<span id="L33" class="LineNr">33 </span>    <span class="Comment">// <a href="http://docs.opencv.org/modules/stitching/doc/introduction.html">http://docs.opencv.org/modules/stitching/doc/introduction.html</a></span>
+<span id="L34" class="LineNr">34 </span>    (cout &lt;&lt; <span class="Constant">&quot;stitching &quot;</span> &lt;&lt; imgs.<span class="Identifier">size</span>() &lt;&lt; <span class="Constant">&quot; images...&quot;</span>).<span class="Identifier">flush</span>();
+<span id="L35" class="LineNr">35 </span>    <span class="Type">Stitcher</span> stitcher = <span class="Special">Stitcher::</span><span class="Identifier">createDefault</span>(<span class="Constant">true</span>);  <span class="Comment">// true for try_use_gpu</span>
+<span id="L36" class="LineNr">36 </span>    <span class="Type">Mat</span> result;
+<span id="L37" class="LineNr">37 </span>    stitcher.<span class="Identifier">stitch</span>(imgs, result);
+<span id="L38" class="LineNr">38 </span>    cout &lt;&lt; <span class="Constant">&quot;</span><span class="Special">\t</span><span class="Constant">OK&quot;</span> &lt;&lt; endl;
+<span id="L39" class="LineNr">39 </span>
+<span id="L40" class="LineNr">40 </span>    <span class="Comment">// save result</span>
+<span id="L41" class="LineNr">41 </span>    (cout &lt;&lt; <span class="Constant">&quot;saving to result.jpg...&quot;</span>).<span class="Identifier">flush</span>();
+<span id="L42" class="LineNr">42 </span>    <span class="Identifier">imwrite</span>(<span class="Constant">&quot;result.jpg&quot;</span>, result);
+<span id="L43" class="LineNr">43 </span>    cout &lt;&lt; <span class="Constant">&quot;</span><span class="Special">\t</span><span class="Constant">OK&quot;</span> &lt;&lt; endl;
+<span id="L44" class="LineNr">44 </span>}
+<span id="L45" class="LineNr">45 </span>
+</pre>
+</body>
+</html>
+<!-- vim: set foldmethod=manual : -->
