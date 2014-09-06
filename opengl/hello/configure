@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+# vim: noet ts=4 sw=4 sts=0 fenc=utf8
+# License: The MIT License with modification. See LICENSE for details.
+# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm@126.com>
+
+
+
+
+my $CC = "clang++";
+my $LD = "clang++";
+my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra";
+my $LDFLAGS = "";
+my $name = "opengl";
+my $dest = "./build/$name";
+my $test = "$dest";
+my @libs = qw(sdl2 gl glu glew);
+
+
+
+
+my @dirs;
+my %targets;
+
+sub gen_dep
+{
+	my ($dir) = @_;
+	return if $dir =~ /\/build$/;
+
+	push @dirs, "build/$dir";
+	print "\e[0;32mprocessing \e[0;35m$dir/\n\e[0m";
+
+	for (<$dir/*.cc>) {
+		print "\e[0;32mprocessing \e[1;35m$_\n\e[1;31m";
+		my $deps = `gcc $CCFLAGS -MM "$_"` or die "\e[0m";
+		print "\e[0m";
+		$deps =~ /^([^:]+):((.|\n)*)\n$/m or die;
+		my $target = $1;
+		my $dep = $2;
+		$targets{"build/$dir/$target"} = $dep;
+	}
+
+	for (<$dir/*/>) {
+		s|/$||;
+		&gen_dep($_);
+	}
+}
+
+sub write_makefile
+{
+	open my $makefile, ">", "makefile" or die;
+	print $makefile <<EOF;
+# vim: noet ts=4 sw=4 sts=0 fenc=utf8
+# License: The MIT License with modification. See LICENSE for details.
+# (C) 2014. eXerigumo Clanjor (哆啦比猫/兰威举) <cjxgm\@126.com>
+
+LOG = file
+LOG_SYSTEM = \$(LOG)_log
+
+CC = $CC
+LD = $LD
+CCFLAGS = $CCFLAGS -DLOG_SYSTEM=\$(LOG_SYSTEM)
+LDFLAGS = $LDFLAGS
+
+EOF
+	print $makefile "CCFLAGS += `pkg-config --cflags $_`\n" for @libs;
+	print $makefile "LDFLAGS += `pkg-config --libs   $_`\n" for @libs;
+	print $makefile <<EOF;
+
+.PHONY: all clean cleanall rebuild reconf test bundle commit install uninstall
+
+all: init app
+clean: makefile
+	\@echo -e "\e[0;32mcleaning\e[0m"
+	rm -rf build
+	rm -f $dest
+	rm -rf bundle
+cleanall: clean
+	rm -f makefile
+rebuild: clean all
+reconf:
+	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	./configure
+test: all
+	\@echo -e "\e[0;32mtesting" "\e[1;35m$name\e[0m"
+	$test
+commit: cleanall
+	git add .
+	git diff --cached
+	env LANG=C git commit -a || true
+	./configure
+bundle: all
+	\@echo -e "\e[0;32mbundling" "\e[1;35m$name\e[0m"
+	rm -rf bundle/
+	cp -r vim/ bundle/
+	mkdir -p bundle/lib/
+	cp $dest bundle/lib/$name.so
+	cp README.md bundle/
+	cp LICENSE* bundle/
+install: bundle uninstall
+	\@echo -e "\e[0;32minstalling" "\e[1;35m$name\e[0m"
+	mkdir -p ~/.vim/bundle/
+	cp -r bundle/ ~/.vim/bundle/opengl/
+uninstall:
+	\@echo -e "\e[0;32muninstalling" "\e[1;35m$name\e[0m"
+	rm -rf ~/.vim/bundle/opengl/
+
+init: makefile build @dirs
+app: makefile $dest
+makefile: configure
+	\@echo -e "\e[0;32mreconfiguring\e[0m"
+	./configure
+build:
+	\@echo -e "\e[0;32mmaking" "\e[1;35mdirectories\e[0m"
+	mkdir -p build
+EOF
+	print $makefile "$_:\n\tmkdir -p $_\n" for @dirs;
+	print $makefile "\n";
+	print $makefile <<EOF for keys %targets;
+$_:$targets{$_} makefile
+	\@echo -e "\e[0;32mcompiling" "\e[1;35m\$@\e[0m"
+	\$(CC) -c -o \$@ \$< \$(CCFLAGS)
+EOF
+	print $makefile <<EOF;
+$dest: @{[keys %targets]}
+	\@echo -e "\e[0;32mlinking" "\e[1;35m\$@\e[0m"
+	\$(LD) -o \$@ \$^ \$(LDFLAGS)
+
+EOF
+	close $makefile
+}
+
+&gen_dep("src");
+&write_makefile;
+
