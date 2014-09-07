@@ -30,9 +30,9 @@ namespace gl
 				});
 	}
 
-	void program::attribute_location(attribute_cref attr, location_type loc) const
+	auto program::location(attribute_cref attr) const -> location_type
 	{
-		glBindAttribLocation(get(), loc, attr.c_str());
+		return glGetAttribLocation(get(), attr.c_str());
 	}
 
 	void program::link()

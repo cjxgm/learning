@@ -28,14 +28,21 @@ namespace gl
 	context::context(dimension_type w, dimension_type h, title_cref title)
 	{
 		library::log() << "context::(ctor)\n";
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_RED_SIZE   ,  8);
+		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE  ,  8);
+		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE ,  8);
+		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE ,  8);
 		SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, true);
+		library::log() << "\tattribute set\n";
+		library::log() << "\t\topengl 3.3 core profile\n";
+		library::log() << "\t\trgba8888\n";
+		library::log() << "\t\t32-bit buffer\n";
+		library::log() << "\t\tdoublebuffer\n";
 
-		library::log() << "\tattributes set.\n";
 		win = {
 			SDL_CreateWindow(title.c_str(),
 					SDL_WINDOWPOS_CENTERED,
@@ -44,8 +51,8 @@ namespace gl
 					SDL_WINDOW_OPENGL),
 			&SDL_DestroyWindow
 		};
-		if (!win) throw std::runtime_error{"cannot create window"};
-		library::log() << "\topengl window created.\n";
+		if (!win) throw std::runtime_error{SDL_GetError()};
+		library::log() << "\twindow created\n";
 
 		ctx = {
 			new raw_context_type(SDL_GL_CreateContext(win.get())),
@@ -54,11 +61,17 @@ namespace gl
 				delete ctx;
 			}
 		};
-		if (!*ctx) throw std::runtime_error{"cannot create context"};
-		library::log() << "\topengl context created.\n";
+		if (!*ctx) throw std::runtime_error{SDL_GetError()};
+		library::log() << "\topengl context created\n";
 
+		glewExperimental = true;	// to get version>2.0 functionality
 		if (glewInit() != GLEW_OK)
 			throw std::runtime_error{"cannot initialize glew"};
+
+		library::log() << "\topengl initialization done\n"
+			<< "\t\tversion : " << glGetString(GL_VERSION) << "\n"
+			<< "\t\tvendor  : " << glGetString(GL_VENDOR) << "\n"
+			<< "\t\trenderer: " << glGetString(GL_RENDERER) << "\n";
 
 		running = true;
 	}

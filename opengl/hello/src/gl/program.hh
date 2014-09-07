@@ -30,7 +30,7 @@ namespace gl
 
 		program();
 		void attach(shader_cref sh);
-		void attribute_location(attribute_cref attr, location_type loc) const;
+		location_type location(attribute_cref attr) const;
 		void link();
 
 		void use() const;
