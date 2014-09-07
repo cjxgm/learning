@@ -8,7 +8,7 @@
 
 my $CC = "clang++";
 my $LD = "clang++";
-my $CCFLAGS = "-std=gnu++11 -march=native -O3 -Wall -Wextra";
+my $CCFLAGS = "-std=gnu++1y -march=native -O3 -Wall -Wextra";
 my $LDFLAGS = "";
 my $name = "opengl";
 my $dest = "./build/$name";

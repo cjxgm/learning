@@ -44,6 +44,7 @@ namespace gl
 					SDL_WINDOW_OPENGL),
 			&SDL_DestroyWindow
 		};
+		if (!win) throw std::runtime_error{"cannot create window"};
 		library::log() << "\topengl window created.\n";
 
 		ctx = {
@@ -53,10 +54,11 @@ namespace gl
 				delete ctx;
 			}
 		};
+		if (!*ctx) throw std::runtime_error{"cannot create context"};
 		library::log() << "\topengl context created.\n";
 
 		if (glewInit() != GLEW_OK)
-			throw std::runtime_error{"glew initialization failed."};
+			throw std::runtime_error{"cannot initialize glew"};
 
 		running = true;
 	}
@@ -76,7 +78,7 @@ namespace gl
 			}
 	}
 
-	void context::clear(glm::vec4 const& color)
+	void context::clear(glm::vec4 const& color) const
 	{
 		static glm::vec4 clear_color;
 		if (clear_color != color) {

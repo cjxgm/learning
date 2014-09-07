@@ -21,8 +21,8 @@ namespace gl
 				title_cref title="opengl");
 
 		void update(bool wait=false);
-		void clear(glm::vec4 const& color={0, 0, 0, 1});
-		operator bool() { return running; }
+		void clear(glm::vec4 const& color={0, 0, 0, 1}) const;
+		operator bool() const { return running; }
 
 	private:
 		raw_window_sptr win;
