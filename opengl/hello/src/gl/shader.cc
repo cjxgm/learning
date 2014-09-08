@@ -1,4 +1,5 @@
 #include "shader.hh"
+#include "../log.hh"
 
 namespace gl
 {
@@ -7,11 +8,13 @@ namespace gl
 		sh = {
 			new raw_shader_type(glCreateShader(GLenum(skind))),
 			[](raw_shader_ptr sh) {
+				library::log() << "shader::delete: " << *sh << "\n";
 				glDeleteShader(*sh);
 				delete sh;
 			}
 		};
 		if (!*sh) throw std::runtime_error{"cannot create shader"};
+		library::log() << "shader::create: " << *sh << "\n";
 	}
 
 	void shader::compile(source_cref src) const

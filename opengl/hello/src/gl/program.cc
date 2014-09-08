@@ -1,4 +1,5 @@
 #include "program.hh"
+#include "../log.hh"
 
 namespace gl
 {
@@ -7,11 +8,13 @@ namespace gl
 		prog = {
 			new raw_program_type(glCreateProgram()),
 			[](raw_program_ptr prog) {
+				library::log() << "program::delete: " << *prog << "\n";
 				glDeleteProgram(*prog);
 				delete prog;
 			}
 		};
 		if (!*prog) throw std::runtime_error{"cannot create program"};
+		library::log() << "program::create: " << *prog << "\n";
 	}
 
 	void program::use() const

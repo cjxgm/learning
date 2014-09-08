@@ -21,12 +21,13 @@ namespace library
 	{
 		struct log
 		{
-			std::ofstream o{"/tmp/library.log"};
+			std::ofstream o{"./library.log"};
 		};
 		template <class T>
 		log& operator<<(log& l, T&& what)
 		{
 			l.o << what;
+			l.o.flush();
 			return l;
 		}
 	}

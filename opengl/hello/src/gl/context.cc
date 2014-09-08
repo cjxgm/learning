@@ -57,6 +57,7 @@ namespace gl
 		ctx = {
 			new raw_context_type(SDL_GL_CreateContext(win.get())),
 			[](raw_context_ptr ctx) {
+				library::log() << "\tdelete opengl context\n";
 				SDL_GL_DeleteContext(*ctx);
 				delete ctx;
 			}

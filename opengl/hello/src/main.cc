@@ -56,13 +56,13 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
 	auto pos = prog.location("position");
-	library::log() << "id[position] = " << pos << "\n";
+	library::log() << "main(): id[position] = " << pos << "\n";
 
 	glEnableVertexAttribArray(pos);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(pos, 3, GL_FLOAT, false, 0, nullptr);
 
-	library::log() << "\tmainloop\n";
+	library::log() << "main(): mainloop\n";
 	while (ctx) {
 		ctx.clear({1.0, 0.6, 0.2, 1.0});
 		glDrawArrays(GL_TRIANGLES, 0, 3);
