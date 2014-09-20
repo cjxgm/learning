@@ -1,5 +1,9 @@
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <algorithm>
 #include "context.hh"
+#include "font.hh"
 
 namespace imgui
 {
@@ -11,6 +15,8 @@ namespace imgui
 			{
 				assert(al_init(), "allegro init failed");
 				assert(al_init_primitives_addon(), "allegro_primitives init failed");
+				al_init_font_addon();	// always success
+				assert(al_init_ttf_addon(), "allegro_ttf init failed");
 				assert(al_install_mouse(), "mouse init failed");
 				assert(al_install_keyboard(), "keyboard init failed");
 			}
@@ -60,13 +66,17 @@ namespace imgui
 								cmd.rgba[3]));
 					break;
 				case command::kind_type::text:
-					// TODO
-					al_draw_filled_rectangle(
-							cmd.xyxy[0]+0.5,
-							cmd.xyxy[1]+0.5,
-							cmd.xyxy[2]+0.5,
-							cmd.xyxy[3]+0.5,
-							al_map_rgba(255, 0, 0, 255));
+					draw_text(
+							cmd.xyxy[0],
+							cmd.xyxy[1],
+							cmd.xyxy[2],
+							cmd.xyxy[3],
+							cmd.ch,
+							al_map_rgba(
+								cmd.rgba[0],
+								cmd.rgba[1],
+								cmd.rgba[2],
+								cmd.rgba[3]));
 					break;
 			}
 		al_flip_display();
@@ -74,13 +84,24 @@ namespace imgui
 
 	void context::update(imgui::state& s)
 	{
-		ALLEGRO_EVENT ev;
-		al_wait_for_event(evq, &ev);
-		switch (ev.type) {
-			case ALLEGRO_EVENT_DISPLAY_CLOSE:
-				running = false;
-				break;
-		}
+		al_wait_for_event(evq, nullptr);
+		for (ALLEGRO_EVENT ev; al_get_next_event(evq, &ev); )
+			switch (ev.type) {
+				case ALLEGRO_EVENT_DISPLAY_CLOSE:
+					running = false;
+					break;
+
+				case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+					s.mouse.down = true;
+					break;
+				case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+					s.mouse.down = false;
+					break;
+				case ALLEGRO_EVENT_MOUSE_AXES:
+					s.mouse.x = ev.mouse.x;
+					s.mouse.y = ev.mouse.y;
+					break;
+			}
 	}
 }
 

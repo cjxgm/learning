@@ -15,17 +15,17 @@ namespace imgui
 		}
 
 		void text(int x, int y, int w, int h, char ch,
-				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0)
+				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF)
 		{
 			add(command::text(x, y, w, h, ch, r, g, b, a));
 		}
 
 		void text(int x, int y, int w, int h, char const* s,
-				int xskip=1, int yskip=1,
-				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0)
+				int size=16, int xskip=1, int yskip=1,
+				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF)
 		{
-			constexpr auto tw = 8;
-			constexpr auto th = 16;
+			auto tw = size/2;
+			auto th = size;
 
 			for (auto cy=y; *s; cy+=th+yskip) {
 				if (cy+th > y+h) break;	// too high, stop now
@@ -49,6 +49,13 @@ namespace imgui
 			newline:
 				continue;
 			}
+		}
+
+		void text(int x, int y, int w, int h, std::string const& s,
+				int size=16, int xskip=1, int yskip=1,
+				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF)
+		{
+			text(x, y, w, h, s.c_str(), size, xskip, yskip, r, g, b, a);
 		}
 
 		void compile()
