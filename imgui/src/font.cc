@@ -1,5 +1,6 @@
 #include <random>
 #include <iterator>
+#include <algorithm>
 #include "font.hh"
 #include "log.hh"
 
@@ -10,8 +11,8 @@ uint_fast32_t rand_less(uint_fast32_t max)
 	return engine() % max;
 }
 
-static size_t  font_cache_massacre_threashold =     16;
-static size_t glyph_cache_massacre_threashold = 256*16;
+static size_t  font_cache_massacre_threshold =     16;
+static size_t glyph_cache_massacre_threshold = 256*16;
 
 namespace imgui
 {
@@ -40,16 +41,16 @@ namespace imgui
 
 	auto font_cache::allocate(fontsize_type s) -> font_mptr
 	{
-		if (cache.size() > font_cache_massacre_threashold)
+		if (cache.size() > font_cache_massacre_threshold)
 			massacre();
 
 		font_mptr font;
 		font.manage(
-				al_load_font("font.ttf", -s, 0),
+				al_load_font("font.ttf", -s, 0),	// "-s" to make height to be "s"
 				&al_destroy_font,
 				"cannot create font");
 
-		library::log() << "font allocated: " << s << "\n";
+		library::log() << "font allocated: [" << s << "]\n";
 		return std::move(font);
 	}
 
@@ -83,7 +84,7 @@ namespace imgui
 
 	auto glyph_cache::allocate(key_type k) -> bitmap_mptr
 	{
-		if (cache.size() > glyph_cache_massacre_threashold)
+		if (cache.size() > glyph_cache_massacre_threshold)
 			massacre();
 
 		auto font = fonts.get(k.first);
@@ -122,8 +123,9 @@ namespace imgui
 	void draw_text(float x1, float y1, float x2, float y2, char ch,
 			ALLEGRO_COLOR color)
 	{
-		auto size = std::max(y2-y1, 2*(x2-x1));
 		static glyph_cache glyphs;
+
+		auto size = std::max(y2-y1, 2*(x2-x1));
 		auto glyph = glyphs.get(size, ch);
 		al_draw_tinted_bitmap(glyph, color, x1, y1, 0);
 

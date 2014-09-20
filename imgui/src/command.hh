@@ -13,12 +13,14 @@ namespace imgui
 
 		static command make(kind_type k,
 				int x, int y, int w, int h,
-				uint8_t r, uint8_t g, uint8_t b, uint8_t a=0xFF)
+				uint8_t r, uint8_t g, uint8_t b, uint8_t a=0xFF,
+				char ch=0)
 		{
 			return {
 				.kind = k,
 				.xyxy = {x, y, x+w, y+h},
-				.rgba = {r, g, b, a}
+				.rgba = {r, g, b, a},
+				.ch   = ch
 			};
 		}
 
@@ -31,9 +33,7 @@ namespace imgui
 		static command text(int x, int y, int w, int h, char ch,
 				uint8_t r=0, uint8_t g=0, uint8_t b=0, uint8_t a=0)
 		{
-			auto cmd = make(kind_type::text, x, y, w, h, r, g, b, a);
-			cmd.ch = ch;
-			return cmd;
+			return make(kind_type::text, x, y, w, h, r, g, b, a, ch);
 		}
 	};
 }

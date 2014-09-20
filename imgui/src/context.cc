@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "context.hh"
 #include "font.hh"
+#include "log.hh"
 
 namespace imgui
 {
@@ -19,6 +20,7 @@ namespace imgui
 				assert(al_init_ttf_addon(), "allegro_ttf init failed");
 				assert(al_install_mouse(), "mouse init failed");
 				assert(al_install_keyboard(), "keyboard init failed");
+				library::log() << "allegro initialized\n";
 			}
 		};
 		allegro _;
@@ -47,6 +49,7 @@ namespace imgui
 		al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 
 		running = true;
+		library::log() << "context(): created\n";
 	}
 
 	void context::render(command_list_cref cmds)

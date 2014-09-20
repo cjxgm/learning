@@ -1,6 +1,6 @@
 #pragma once
-#include <list>
 #include <allegro5/allegro.h>
+#include <list>
 #include "state.hh"
 #include "manage.hh"
 #include "command.hh"

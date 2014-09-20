@@ -1,14 +1,11 @@
 #include "context.hh"
 #include "compiler.hh"
-
-#include <iostream>
-using std::cin;
-using std::cout;
-using std::cerr;
-using std::endl;
+#include "log.hh"
 
 int main()
 {
+	library::log() << "main(): enter\n";
+
 	imgui::context ctx{640, 480};
 	imgui::state s;
 	imgui::compiler cpr;
@@ -16,7 +13,7 @@ int main()
 	bool a;
 	int size = 1;
 	while (ctx) {
-		cout << "render" << endl;
+		library::log() << "main(): render\n";
 
 		cpr.rect(0, 0, 640, 480, 255, 0, 0, 255);
 
@@ -36,5 +33,7 @@ int main()
 		ctx.render(cmds);
 		ctx.update(s);
 	}
+
+	library::log() << "main(): leave\n";
 }
 
