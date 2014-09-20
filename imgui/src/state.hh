@@ -10,7 +10,7 @@ namespace imgui
 			int y;
 			bool down;
 		}
-		mouse;
+		mouse = { 0, 0, false };
 	};
 }
 

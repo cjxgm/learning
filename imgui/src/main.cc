@@ -10,7 +10,7 @@ int main()
 	imgui::state s;
 	imgui::compiler cpr;
 
-	bool a;
+	bool a = true;
 	int size = 1;
 	while (ctx) {
 		library::log() << "main(): render\n";
