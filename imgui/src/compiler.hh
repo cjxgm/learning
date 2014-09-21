@@ -83,8 +83,9 @@ namespace imgui
 
 		void add(command cmd)
 		{
-			if (cl.clip(cmd.clip))
-				commands.emplace_back(std::move(cmd));
+			if (!cmd.color.visible()) return;
+			if (!cl.clip(cmd.clip)) return;
+			commands.emplace_back(std::move(cmd));
 		}
 
 		bool push(xyxy      & r) { return cl.push(r); }

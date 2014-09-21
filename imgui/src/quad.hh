@@ -96,6 +96,8 @@ namespace imgui
 		bool operator == (self_cref x) const { return (data == x.data); }
 		bool operator != (self_cref x) const { return (data != x.data); }
 		operator ALLEGRO_COLOR () const { return al_map_rgba(r, g, b, a); }
+		bool     visible() const { return (a != 0x00); }
+		bool transparent() const { return (a != 0xFF && visible()); }
 	};
 }
 
