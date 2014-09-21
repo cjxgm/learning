@@ -12,7 +12,7 @@ namespace imgui
 		for (auto cy=y; *s; cy+=th+yskip) {
 			if (cy+th > y+h) break;	// too high, stop now
 
-			for (auto cx=x; *s; cx+=tw+xskip) {
+			for (auto cx=x, i=0; *s; cx+=tw+xskip, i++) {
 				if (cx+tw > x+w) {	// too wide, go newline
 					while (*s && *s != '\n') s++;
 					if (*s) s++;
@@ -21,6 +21,12 @@ namespace imgui
 				auto ch = *s++;
 				switch (ch) {
 					case '\n': goto newline;
+					case '\t': {
+						auto ni = (((i >> 2) + 1) << 2) - 1;
+						cx += (tw+xskip) * (ni-i);
+						i = ni;
+						continue;
+					}
 					case ' ' : continue;
 					default:
 						text(cx, cy, tw, th, ch, r, g, b, a);
