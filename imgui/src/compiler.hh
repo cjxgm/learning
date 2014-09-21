@@ -1,89 +1,100 @@
 #pragma once
+#include <string>
+#include <utility>
 #include "context.hh"
 #include "command.hh"
 #include "clipper.hh"
 #include "stack_guard.hh"
+#include "quad.hh"
+
 
 namespace imgui
 {
 	struct compiler
 	{
 		using command_list = context::command_list;
+		using clip_guard = stack_guard<compiler>;
 
-		void rect(int x, int y, int w, int h,
-				uint32_t r=0xFF, uint32_t g=0xFF, uint32_t b=0xFF, uint32_t a=0xFF)
+		void rect(
+				xyxy const& clip,
+				rgba const& color={0xFF})
 		{
-			add(command::rect(x, y, w, h, r, g, b, a));
+			add(command::rect(clip, color));
 		}
 
-		void clip(int x, int y, int w, int h)
+		void text(
+				xyxy const& clip,
+				char ch,
+				rgba const& color={0})
 		{
-			add(command::clip(x, y, w, h));
+			add(command::text(clip, color, clip, ch));
 		}
 
-		void clip(clipper const& cl)
+		void text(
+				xyxy const& clip,
+				char const* s,
+				rgba const& color={0},
+				xywh const& skip_and_size = { 1, 1, 8, 16 });
+
+		void text(
+				xyxy const& clip,
+				std::string const& s,
+				rgba const& color={0},
+				xywh const& skip_and_size = { 1, 1, 8, 16 })
 		{
-			int xyxy[4];
-			cl.get(xyxy);
-			if (xyxy[2] < xyxy[0]) xyxy[2] = xyxy[0];
-			if (xyxy[3] < xyxy[1]) xyxy[3] = xyxy[1];
-			add(command::clip(
-						xyxy[0], xyxy[1],
-						xyxy[2]-xyxy[0], xyxy[3]-xyxy[1]));
+			text(clip, s.c_str(), color, skip_and_size);
 		}
 
-		// for stack_guard
-		void push(int x, int y, int w, int h)
+		static xywh make_skip_and_size(
+				int xskip, int yskip,
+				int xsize, int ysize)
 		{
-			cl.push(x, y, x+w, y+h);
-			clip(cl);
-		}
-		void pop()
-		{
-			cl.pop();
-			clip(cl);
+			return { xskip, yskip, xsize, ysize };
 		}
 
-		void text(int x, int y, int w, int h, char ch,
-				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF)
+		static xywh make_skip_and_size(int xskip, int yskip, int size)
 		{
-			add(command::text(x, y, w, h, ch, r, g, b, a));
+			return make_skip_and_size(xskip, yskip, size>>1, size);
 		}
 
-		void text(int x, int y, int w, int h, char const* s,
-				int size=16, int xskip=1, int yskip=1,
-				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF);
-
-		void text(int x, int y, int w, int h, std::string const& s,
-				int size=16, int xskip=1, int yskip=1,
-				uint32_t r=0, uint32_t g=0, uint32_t b=0, uint32_t a=0xFF)
+		static xywh make_skip_and_size(int skip, int size)
 		{
-			text(x, y, w, h, s.c_str(), size, xskip, yskip, r, g, b, a);
+			return make_skip_and_size(skip, skip, size);
 		}
 
-		void size(int w, int h)
+		static xywh make_skip_and_size(int size)
 		{
-			cl.set(0, 0, w, h);
+			return make_skip_and_size(1, size);
 		}
 
+		static xywh make_skip_and_size()
+		{
+			return make_skip_and_size(1, 16);
+		}
+
+		void size(int w, int h) { cl.set(xywh{0, 0, w, h}); }
 		void compile();
-
-		command_list get()
-		{
-			return std::move(commands);
-		}
+		command_list get() { return std::move(commands); }
 
 	private:
 		command_list commands;
 		command_list last_commands;
 		clipper cl;
 
-		void add(command const& cmd)
+		void add(command cmd)
 		{
-			commands.push_back(cmd);
+			if (cl.clip(cmd.clip))
+				commands.emplace_back(std::move(cmd));
 		}
+
+		bool push(xyxy      & r) { return cl.push(r); }
+		bool push(xyxy const& r) { return cl.push(r); }
+		void pop() { cl.pop(); }
+		friend clip_guard;
+
+		void compile(xyxy const& clip, command_list const& cmds);
 	};
 
-	using clip_guard = stack_guard<compiler>;
+	using clip_guard = compiler::clip_guard;
 }
 

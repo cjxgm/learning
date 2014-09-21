@@ -1,4 +1,7 @@
 #pragma once
+// a stack-like's guard
+// push on construction
+// pop  on  destruction
 #include <utility>
 
 namespace imgui
@@ -15,10 +18,7 @@ namespace imgui
 
 		template <class ...Args>
 		stack_guard(value_ref v, Args&& ...args)
-			: value{v}
-		{
-			value.push(std::forward<Args>(args)...);
-		}
+			: value{v}, valid{value.push(std::forward<Args>(args)...)} {}
 
 		~stack_guard() { value.pop(); }
 
@@ -27,8 +27,11 @@ namespace imgui
 		self_ref operator = (self_cref) = delete;
 		self_ref operator = (self_rref) = delete;
 
+		operator bool () const { return valid; }
+
 	private:
 		value_ref value;
+		bool valid;
 	};
 }
 

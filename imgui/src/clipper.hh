@@ -1,57 +1,53 @@
 #pragma once
 #include <tuple>
 #include <vector>
+#include <utility>
+#include "quad.hh"
+#include "math.hh"
 
 namespace imgui
 {
 	// you must set the max clip the first time you use this!
 	struct clipper
 	{
-		using xyxy = std::tuple<int, int, int, int>;
-		using xyxy_ref = xyxy &;
-		using xyxy_cref = xyxy const&;
-		using stack_type = std::vector<xyxy>;
+		using value_type = std::pair<bool, xyxy>;
+		using value_ref  = value_type &;
+		using value_cref = value_type const&;
+		using stack_type = std::vector<value_type>;
 
 		clipper() : stack(1) {}
 
-		void set(int x1, int y1, int x2, int y2);
-		void set(int const clip[4])
-		{
-			set(
-				clip[0],
-				clip[1],
-				clip[2],
-				clip[3]);
-		}
+		value_ref   top()       { return *stack. rbegin(); }
+		value_cref  top() const { return *stack.crbegin(); }
+		xyxy      & get()       { return top().second; }
+		xyxy const& get() const { return top().second; }
+		void get(xyxy & r) const { r = get(); }
+		void set(xyxy const& r) { top() = { true, r }; }
+		bool valid() const { return top().first; }
 
-		xyxy_ref  get()       { return *stack. rbegin(); }
-		xyxy_cref get() const { return *stack.crbegin(); }
-		void get(int clip[4]) const
+		bool clip(xyxy & r)
 		{
-			std::tie(
-				clip[0],
-				clip[1],
-				clip[2],
-				clip[3]) = get();
-		}
-
-		void push(int x1, int y1, int x2, int y2);
-		void push(int const clip[4])
-		{
-			push(
-				clip[0],
-				clip[1],
-				clip[2],
-				clip[3]);
+			if (!valid()) return false;
+			return imgui::clip(get(), r);
 		}
 
 		void pop() { stack.pop_back(); }
 
+		bool push(xyxy & r)
+		{
+			auto valid = clip(r);
+			stack.emplace_back(valid, r);
+			return valid;
+		}
+
+		bool push(xyxy const& r)
+		{
+			auto copy = r;
+			return push(copy);
+		}
+
 	private:
 		stack_type stack;
-
-		static void clip(xyxy boundary,
-				int& x1, int& y1, int& x2, int& y2);
 	};
 }
 

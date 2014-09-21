@@ -11,24 +11,34 @@ int main()
 	imgui::compiler cpr;
 	cpr.size(640, 480);
 
+	using imgui::xywh;
+	using imgui::xyxy;
+	using imgui::rgba;
+
 	bool a = true;
 	int size = 1;
 	while (ctx) {
 		library::log() << "main(): render\n";
 
-		cpr.rect(0, 0, 640, 480, 255, 0, 0, 255);
+		cpr.rect(xywh{0, 0, 640, 480}, rgba{255, 0, 0});
 
 		std::string text{"hello\ta\tab\tabc\tabcd\tabcde\nworld 123 yes or no?\n\t"};
 		text += std::to_string(size);
 		text += "\t";
 		text += std::to_string(a);
 		{
-			imgui::clip_guard _(cpr, 100, 100, 400, 200);
-			cpr.rect(100, 100, 400, 200, 0, 0, 200);
-			cpr.rect(s.mouse.x+10, s.mouse.y+10, 200, 80, 255, 255, 100);
-			cpr.text(s.mouse.x+10, s.mouse.y+10, 200, 80, text, size);
+			imgui::clip_guard guard(cpr, xywh{100, 100, 400, 200});
+			if (guard) {
+				cpr.rect(xywh{100, 100, 400, 200}, rgba{0, 0, 255, 200});
+				for (int y=0; y<480; y+=20)
+					for (int x=0; x<640; x+=20)
+						cpr.text(xywh{x, y, 20, 20}, "hi");
+				cpr.rect(xywh{s.mouse.x+10, s.mouse.y+10, 20, 20}, rgba{255, 255, 100, 150});
+				//cpr.rect(xywh{s.mouse.x+10, s.mouse.y+10, 200, 80}, rgba{255, 255, 100});
+				//cpr.text(xywh{s.mouse.x+10, s.mouse.y+10, 200, 80}, text, {0}, cpr.make_skip_and_size(size));
+			}
 		}
-		if (a) cpr.rect(10, 10, 100, 10, 255, 255, 255, 255);
+		if (a) cpr.rect(xywh{10, 10, 100, 10}, rgba{255, 200});
 		a = !a;
 
 		if (size++ > 64) size = 1;

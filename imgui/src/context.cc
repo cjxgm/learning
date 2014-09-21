@@ -54,46 +54,34 @@ namespace imgui
 
 	void context::render(command_list_cref cmds)
 	{
-		for (auto& cmd: cmds)
+		for (auto& cmd: cmds) {
+			clip(cmd.clip);
 			switch (cmd.kind) {
 				case command::kind_type::rect:
+					//clear(cmd.color);	// FIXME: don't blend
 					al_draw_filled_rectangle(
-							cmd.xyxy[0]+0.5,
-							cmd.xyxy[1]+0.5,
-							cmd.xyxy[2]+0.5,
-							cmd.xyxy[3]+0.5,
-							al_map_rgba(
-								cmd.rgba[0],
-								cmd.rgba[1],
-								cmd.rgba[2],
-								cmd.rgba[3]));
-					break;
-				case command::kind_type::clip:
-					al_set_clipping_rectangle(
-							cmd.xyxy[0],
-							cmd.xyxy[1],
-							cmd.xyxy[2]-cmd.xyxy[0],
-							cmd.xyxy[3]-cmd.xyxy[1]);
-					library::log() << "clip: "
-						<< cmd.xyxy[0] << ", "
-						<< cmd.xyxy[1] << ", "
-						<< cmd.xyxy[2] << ", "
-						<< cmd.xyxy[3] << "\n";
+							cmd.clip[0]+0.5f,
+							cmd.clip[1]+0.5f,
+							cmd.clip[2]+0.5f,
+							cmd.clip[3]+0.5f,
+							cmd.color);
+					library::log() << "rect: "
+						<< cmd.clip[0] << ", "
+						<< cmd.clip[1] << ", "
+						<< cmd.clip[2] << ", "
+						<< cmd.clip[3] << "\n";
 					break;
 				case command::kind_type::text:
-					draw_text(
-							cmd.xyxy[0],
-							cmd.xyxy[1],
-							cmd.xyxy[2],
-							cmd.xyxy[3],
-							cmd.ch,
-							al_map_rgba(
-								cmd.rgba[0],
-								cmd.rgba[1],
-								cmd.rgba[2],
-								cmd.rgba[3]));
+					draw_text(cmd.region, cmd.color, cmd.ch);
+					library::log() << "text: "
+						<< cmd.clip[0] << ", "
+						<< cmd.clip[1] << ", "
+						<< cmd.clip[2] << ", "
+						<< cmd.clip[3] << "    "
+						<< cmd.ch << "\n";
 					break;
 			}
+		}
 		al_flip_display();
 	}
 
@@ -117,6 +105,16 @@ namespace imgui
 					s.mouse.y = ev.mouse.y;
 					break;
 			}
+	}
+
+	void context::clip(xywh const& r)
+	{
+		al_set_clipping_rectangle(r.x, r.y, r.w, r.h);
+	}
+
+	void context::clear(rgba const& color)
+	{
+		al_clear_to_color(color);
 	}
 }
 

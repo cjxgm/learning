@@ -1,45 +1,80 @@
 #pragma once
 #include <cstdint>
+#include <array>
+#include "quad.hh"
 
 namespace imgui
 {
+	// command: rect
+	// 		draw a rectangle of color "color" inside "clip".
+	//
+	// command: text
+	// 		draw the text "ch" of color "color"
+	// 		at "region.x, region.y" of size "region.w, region.h",
+	// 		clipped inside "clip"
+	//
 	struct command
 	{
-		enum class kind_type { rect, clip, text };
+		enum class kind_type { rect, text };
+
 		kind_type kind;
-		int xyxy[4];
-		uint8_t rgba[4];
+		xyxy clip;
+		rgba color;
+		xywh region;
 		char ch;
 
-		static command make(kind_type k,
-				int x, int y, int w, int h,
-				uint8_t r=0, uint8_t g=0, uint8_t b=0, uint8_t a=0xFF,
-				char ch=0)
+		static command make(
+				kind_type kind,
+				xyxy const& clip,
+				rgba const& color={0},
+				xywh const& region={},
+				char ch={})
 		{
 			return {
-				.kind = k,
-				.xyxy = {x, y, x+w, y+h},
-				.rgba = {r, g, b, a},
-				.ch   = ch
+				.kind   = kind,
+				.clip   = clip,
+				.color  = color,
+				.region = region,
+				.ch     = ch
 			};
 		}
 
-		static command rect(int x, int y, int w, int h,
-				uint8_t r=0xFF, uint8_t g=0xFF, uint8_t b=0xFF, uint8_t a=0xFF)
+		static command rect(
+				xyxy const& clip,
+				rgba const& color)
 		{
-			return make(kind_type::rect, x, y, w, h, r, g, b, a);
+			return make(kind_type::rect, clip, color);
 		}
 
-		static command clip(int x, int y, int w, int h)
+		static command text(
+				xyxy const& clip,
+				rgba const& color,
+				xywh const& region,
+				char ch)
 		{
-			return make(kind_type::clip, x, y, w, h);
-		}
-
-		static command text(int x, int y, int w, int h, char ch,
-				uint8_t r=0, uint8_t g=0, uint8_t b=0, uint8_t a=0)
-		{
-			return make(kind_type::text, x, y, w, h, r, g, b, a, ch);
+			return make(kind_type::text, clip, color, region, ch);
 		}
 	};
+
+	inline bool operator == (command const& a, command const& b)
+	{
+		if (a.kind != b.kind) return false;
+		switch (a.kind) {
+			case command::kind_type::text:
+				if (a.ch != b.ch) return false;
+				if (a.region != b.region) return false;
+				// pass through intentionally
+			case command::kind_type::rect:
+				if (a.clip != b.clip) return false;
+				if (a.color != b.color) return false;
+				break;
+		}
+		return true;
+	}
+
+	inline bool operator != (command const& a, command const& b)
+	{
+		return !(a == b);	// FIXME: is it correct and efficient to do so?
+	}
 }
 

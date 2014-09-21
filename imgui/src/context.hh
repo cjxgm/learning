@@ -4,6 +4,7 @@
 #include "state.hh"
 #include "manage.hh"
 #include "command.hh"
+#include "quad.hh"
 
 namespace imgui
 {
@@ -22,6 +23,8 @@ namespace imgui
 
 		void render(command_list_cref cmds);
 		void update(imgui::state& s);
+		void clip(xywh const& r);
+		void clear(rgba const& color);
 
 	private:
 		    display_mptr disp;

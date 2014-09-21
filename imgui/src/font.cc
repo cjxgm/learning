@@ -120,22 +120,21 @@ namespace imgui
 
 
 
-	void draw_text(float x1, float y1, float x2, float y2, char ch,
-			ALLEGRO_COLOR color)
+	void draw_text(xywh const& region, rgba const& color, char_type ch)
 	{
 		static glyph_cache glyphs;
 
-		auto size = std::max(y2-y1, 2*(x2-x1));
+		auto size = std::min(region.h, 2*region.w);
 		auto glyph = glyphs.get(size, ch);
-		al_draw_tinted_bitmap(glyph, color, x1, y1, 0);
+		al_draw_tinted_bitmap(glyph, color, region.x, region.y, 0);
 
 		// TODO: is this a better way?
 		//al_draw_tinted_scaled_bitmap(
 		//		glyph, color,
 		//		0, 0,
 		//		al_get_bitmap_width(glyph), al_get_bitmap_height(glyph),
-		//		x1, y1,
-		//		x2-x1, y2-y1,
+		//		region.x, region.y,
+		//		region.w, region.h,
 		//		0);
 	}
 }

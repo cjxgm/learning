@@ -3,6 +3,8 @@
 #include <allegro5/allegro_font.h>
 #include <unordered_map>
 #include "manage.hh"
+#include "quad.hh"
+#include "math.hh"
 
 namespace imgui
 {
@@ -43,13 +45,6 @@ namespace imgui
 		{
 			using pair = std::pair<T, U>;
 
-			template <class V>
-			void hash_combine(size_t& seed, V const& x) const
-			{
-				std::hash<V> hash;
-				seed ^= (hash(x) + 0x9e3779b9 + (seed << 6) + (seed >> 2));
-			}
-
 			size_t operator () (pair const& p) const
 			{
 				size_t seed = 0;
@@ -79,10 +74,10 @@ namespace imgui
 		bitmap_mptr allocate(key_type ch);
 	};
 
+	using char_type = glyph_cache::char_type;
 
 
 
-	void draw_text(float x1, float y1, float x2, float y2, char ch,
-			ALLEGRO_COLOR color);
+	void draw_text(xywh const& region, rgba const& color, char_type ch);
 }
 

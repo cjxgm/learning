@@ -14,7 +14,7 @@ namespace library
 	{
 		struct log {};
 		template <class T>
-		log& operator<<(log& l, T&&) { return l; }
+		log& operator << (log& l, T&&) { return l; }
 	}
 
 	namespace file_log
@@ -24,7 +24,7 @@ namespace library
 			std::ofstream o{"/tmp/pilot3d.log"};
 		};
 		template <class T>
-		log& operator<<(log& l, T&& what)
+		log& operator << (log& l, T&& what)
 		{
 			l.o << what;
 			l.o.flush();
@@ -36,7 +36,7 @@ namespace library
 	{
 		struct log {};
 		template <class T>
-		log& operator<<(log& l, T&& what)
+		log& operator << (log& l, T&& what)
 		{
 			std::cerr << what;
 			return l;
