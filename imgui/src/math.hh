@@ -8,7 +8,7 @@ namespace imgui
 	{
 		inline bool segment(int a1, int a2, int b1, int b2)
 		{
-			return (b1 < a2 && a1 < b2);
+			return (b1 <= a2 && a1 <= b2);
 		}
 
 		inline bool rectangle(xyxy const& a, xyxy const& b)
@@ -52,6 +52,15 @@ namespace imgui
 	{
 		std::hash<T> hash;
 		seed ^= (hash(x) + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+	}
+
+
+	inline void merge(xyxy & dst, xyxy src)
+	{
+		reorder(dst.x1, src.x1);
+		reorder(dst.y1, src.y1);
+		reorder(src.x2, dst.x2);
+		reorder(src.y2, dst.y2);
 	}
 }
 

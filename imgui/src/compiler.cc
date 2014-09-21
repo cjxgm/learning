@@ -74,6 +74,7 @@ namespace imgui
 		}
 		for (auto& cmd: last_commands)
 			m.add(cmd.clip);
+		m.merge();
 
 
 		library::log() << "update:\n";
