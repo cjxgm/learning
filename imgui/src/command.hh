@@ -5,7 +5,7 @@ namespace imgui
 {
 	struct command
 	{
-		enum class kind_type { rect, text };
+		enum class kind_type { rect, clip, text };
 		kind_type kind;
 		int xyxy[4];
 		uint8_t rgba[4];
@@ -13,7 +13,7 @@ namespace imgui
 
 		static command make(kind_type k,
 				int x, int y, int w, int h,
-				uint8_t r, uint8_t g, uint8_t b, uint8_t a=0xFF,
+				uint8_t r=0, uint8_t g=0, uint8_t b=0, uint8_t a=0xFF,
 				char ch=0)
 		{
 			return {
@@ -28,6 +28,11 @@ namespace imgui
 				uint8_t r=0xFF, uint8_t g=0xFF, uint8_t b=0xFF, uint8_t a=0xFF)
 		{
 			return make(kind_type::rect, x, y, w, h, r, g, b, a);
+		}
+
+		static command clip(int x, int y, int w, int h)
+		{
+			return make(kind_type::clip, x, y, w, h);
 		}
 
 		static command text(int x, int y, int w, int h, char ch,

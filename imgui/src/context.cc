@@ -68,6 +68,18 @@ namespace imgui
 								cmd.rgba[2],
 								cmd.rgba[3]));
 					break;
+				case command::kind_type::clip:
+					al_set_clipping_rectangle(
+							cmd.xyxy[0],
+							cmd.xyxy[1],
+							cmd.xyxy[2]-cmd.xyxy[0],
+							cmd.xyxy[3]-cmd.xyxy[1]);
+					library::log() << "clip: "
+						<< cmd.xyxy[0] << ", "
+						<< cmd.xyxy[1] << ", "
+						<< cmd.xyxy[2] << ", "
+						<< cmd.xyxy[3] << "\n";
+					break;
 				case command::kind_type::text:
 					draw_text(
 							cmd.xyxy[0],

@@ -1,3 +1,4 @@
+#include <iterator>
 #include "compiler.hh"
 
 namespace imgui
@@ -6,14 +7,16 @@ namespace imgui
 			int size, int xskip, int yskip,
 			uint32_t r, uint32_t g, uint32_t b, uint32_t a)
 	{
+		clip_guard _(*this, x, y, w, h);
+
 		auto tw = size/2;
 		auto th = size;
 
 		for (auto cy=y; *s; cy+=th+yskip) {
-			if (cy+th > y+h) break;	// too high, stop now
+			if (cy > y+h) break;	// too high, stop now
 
 			for (auto cx=x, i=0; *s; cx+=tw+xskip, i++) {
-				if (cx+tw > x+w) {	// too wide, go newline
+				if (cx > x+w) {	// too wide, go newline
 					while (*s && *s != '\n') s++;
 					if (*s) s++;
 					break;
@@ -41,6 +44,10 @@ namespace imgui
 
 	void compiler::compile()
 	{
+		// FIXME
+		clip(cl);
+		commands.splice(commands.begin(), commands, std::prev(commands.end()));
+
 		// TODO
 		// compile the raw bunch of drawing commands
 		// into optimized minimum drawing commands

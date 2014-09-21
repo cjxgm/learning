@@ -67,7 +67,7 @@ namespace imgui
 
 		bitmap_ptr get(fontsize_type s, char_type ch)
 		{
-			return get(std::make_pair(s, ch));
+			return get({s, ch});
 		}
 
 	private:
