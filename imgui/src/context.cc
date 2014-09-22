@@ -65,20 +65,20 @@ namespace imgui
 							cmd.clip[2]+0.5f,
 							cmd.clip[3]+0.5f,
 							cmd.color);
-					library::log() << "rect: "
-						<< cmd.clip[0] << ", "
-						<< cmd.clip[1] << ", "
-						<< cmd.clip[2] << ", "
-						<< cmd.clip[3] << "\n";
+					//library::log() << "rect: "
+					//	<< cmd.clip[0] << ", "
+					//	<< cmd.clip[1] << ", "
+					//	<< cmd.clip[2] << ", "
+					//	<< cmd.clip[3] << "\n";
 					break;
 				case command::kind_type::text:
 					draw_text(cmd.region, cmd.color, cmd.ch);
-					library::log() << "text: "
-						<< cmd.clip[0] << ", "
-						<< cmd.clip[1] << ", "
-						<< cmd.clip[2] << ", "
-						<< cmd.clip[3] << "    "
-						<< cmd.ch << "\n";
+					//library::log() << "text: "
+					//	<< cmd.clip[0] << ", "
+					//	<< cmd.clip[1] << ", "
+					//	<< cmd.clip[2] << ", "
+					//	<< cmd.clip[3] << "    "
+					//	<< cmd.ch << "\n";
 					break;
 			}
 		}

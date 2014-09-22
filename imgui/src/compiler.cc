@@ -4,6 +4,11 @@
 #include "merger.hh"
 #include "log.hh"
 #include "math.hh"
+#include "benchmark.hh"
+
+static imgui::benchmark bm_damage;
+static imgui::benchmark bm_merge;
+static imgui::benchmark bm_optimize;
 
 namespace imgui
 {
@@ -63,27 +68,34 @@ namespace imgui
 
 		// detect damaged region (brute force)
 		merger m;
-		for (auto& cmd: commands) {
-			auto it = std::find(
-					last_commands.begin(),
-					last_commands.end(),
-					cmd);
-			if (it != last_commands.end())
-				last_commands.erase(it);
-			else m.add(cmd.clip);
+		{
+			auto measure = bm_damage.measure();
+
+			for (auto& cmd: commands) {
+				auto it = std::find(
+						last_commands.begin(),
+						last_commands.end(),
+						cmd);
+				if (it != last_commands.end())
+					last_commands.erase(it);
+				else m.add(cmd.clip);
+			}
+			for (auto& cmd: last_commands)
+				m.add(cmd.clip);
 		}
-		for (auto& cmd: last_commands)
-			m.add(cmd.clip);
-		m.merge();
+		{
+			auto measure = bm_merge.measure();
+			m.merge();
+		}
 
 
-		library::log() << "update:\n";
-		for (auto& rect: m)
-			library::log() << "\t"
-				<< rect[0] << ", "
-				<< rect[1] << ", "
-				<< rect[2] << ", "
-				<< rect[3] << "\n";
+		//library::log() << "update:\n";
+		//for (auto& rect: m)
+		//	library::log() << "\t"
+		//		<< rect[0] << ", "
+		//		<< rect[1] << ", "
+		//		<< rect[2] << ", "
+		//		<< rect[3] << "\n";
 
 
 		// move away to get space for new commands
@@ -92,7 +104,14 @@ namespace imgui
 
 		// generate partial update command from last_commands
 		// TODO: top to bottom, no alpha no update, alpha then down
-		for (auto& rect: m) compile(rect, last_commands);
+		{
+			auto measure = bm_optimize.measure();
+			for (auto& rect: m) compile(rect, last_commands);
+		}
+
+		library::log() << "benchmark compiler damage  : " << bm_damage  .ms() << " ms\n";
+		library::log() << "benchmark compiler merge   : " << bm_merge   .ms() << " ms\n";
+		library::log() << "benchmark compiler optimize: " << bm_optimize.ms() << " ms\n";
 	}
 
 	// recompile those clipped by "clip"

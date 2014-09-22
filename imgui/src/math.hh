@@ -62,5 +62,27 @@ namespace imgui
 		reorder(src.x2, dst.x2);
 		reorder(src.y2, dst.y2);
 	}
+
+
+	inline int downsample_floor(int x, int level)
+	{
+		return (x >> level) << level;
+	}
+
+	inline int downsample_ceil(int x, int level)
+	{
+		auto mask = (1 << level) - 1;
+		return ((x >> level) + !!(x & mask)) << level;
+	}
+
+	inline xyxy downsample(xyxy const& r, int level)
+	{
+		return {
+			downsample_floor(r.x1, level),
+			downsample_floor(r.y1, level),
+			downsample_ceil (r.x2, level),
+			downsample_ceil (r.y2, level)
+		};
+	}
 }
 
