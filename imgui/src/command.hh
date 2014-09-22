@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <type_traits>
 #include "quad.hh"
+#include "math.hh"
 
 namespace imgui
 {
@@ -16,6 +18,7 @@ namespace imgui
 	struct command
 	{
 		enum class kind_type { rect, text };
+		using kind_utype = std::underlying_type_t<kind_type>;
 
 		kind_type kind;
 		xyxy clip;
@@ -76,5 +79,20 @@ namespace imgui
 	{
 		return !(a == b);	// FIXME: is it correct and efficient to do so?
 	}
+
+
+	struct command_hash
+	{
+		size_t operator () (command const& cmd) const
+		{
+			size_t seed = 0;
+			hash_combine(seed, static_cast<command::kind_utype>(cmd.kind));
+			hash_combine<xyxy_hash>(seed, cmd.clip);
+			hash_combine<rgba_hash>(seed, cmd.color);
+			hash_combine<xywh_hash>(seed, cmd.region);
+			hash_combine(seed, cmd.ch);
+			return seed;
+		}
+	};
 }
 

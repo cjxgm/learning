@@ -46,12 +46,21 @@ namespace imgui
 	}
 
 
+	template <class Hasher, class T>
+		// requires Hashable<Hasher, T>()
+	inline void hash_combine(size_t& seed, T const& x)
+	{
+		Hasher hash;
+		seed ^= (hash(x) + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+	}
+
 	template <class T>
 		// requires Hashable<T>()
 	inline void hash_combine(size_t& seed, T const& x)
 	{
-		std::hash<T> hash;
-		seed ^= (hash(x) + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+		using std::hash;
+		using hasher = hash<T>;
+		hash_combine<hasher>(seed, x);
 	}
 
 
@@ -84,5 +93,26 @@ namespace imgui
 			downsample_ceil (r.y2, level)
 		};
 	}
+
+
+	// some hashers for quad types
+	template <class Q>
+		// requires Quad<Q>()
+	struct quad_hash
+	{
+		size_t operator () (Q const& q) const
+		{
+			size_t seed = 0;
+			hash_combine(seed, q[0]);
+			hash_combine(seed, q[1]);
+			hash_combine(seed, q[2]);
+			hash_combine(seed, q[3]);
+			return seed;
+		}
+	};
+
+	using xyxy_hash = quad_hash<xyxy>;
+	using xywh_hash = quad_hash<xywh>;
+	using rgba_hash = quad_hash<rgba>;
 }
 

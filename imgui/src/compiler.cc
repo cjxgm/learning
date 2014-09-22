@@ -60,28 +60,25 @@ namespace imgui
 	}
 
 
+	// compile the raw bunch of drawing commands
+	// into optimized minimum drawing commands
 	void compiler::compile()
 	{
-		// compile the raw bunch of drawing commands
-		// into optimized minimum drawing commands
-
+		auto cmds = std::move(commands);
 
 		// detect damaged region (brute force)
 		merger m;
 		{
 			auto measure = bm_damage.measure();
 
-			for (auto& cmd: commands) {
-				auto it = std::find(
-						last_commands.begin(),
-						last_commands.end(),
-						cmd);
-				if (it != last_commands.end())
-					last_commands.erase(it);
+			for (auto& cmd: cmds) {
+				auto it = last.find(cmd);
+				if (it != last.end())
+					last.erase(it);
 				else m.add(cmd.clip);
 			}
-			for (auto& cmd: last_commands)
-				m.add(cmd.clip);
+			for (auto& pair: last)
+				m.add(pair.first.clip);
 		}
 		{
 			auto measure = bm_merge.measure();
@@ -99,14 +96,15 @@ namespace imgui
 
 
 		// move away to get space for new commands
-		last_commands = std::move(commands);
+		last.clear();
+		for (auto& cmd: cmds) last[cmd] = true;
 
 
 		// generate partial update command from last_commands
 		// TODO: top to bottom, no alpha no update, alpha then down
 		{
 			auto measure = bm_optimize.measure();
-			for (auto& rect: m) compile(rect, last_commands);
+			for (auto& rect: m) compile(rect, cmds);
 		}
 
 		library::log() << "benchmark compiler damage  : " << bm_damage  .ms() << " ms\n";

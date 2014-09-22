@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <utility>
+#include <unordered_map>
 #include "context.hh"
 #include "command.hh"
 #include "clipper.hh"
@@ -12,8 +13,9 @@ namespace imgui
 {
 	struct compiler
 	{
-		using command_list = context::command_list;
 		using clip_guard = stack_guard<compiler>;
+		using command_list = context::command_list;
+		using command_table = std::unordered_map<command, bool, command_hash>;
 
 		void rect(
 				xyxy const& clip,
@@ -78,7 +80,7 @@ namespace imgui
 
 	private:
 		command_list commands;
-		command_list last_commands;
+		command_table last;
 		clipper cl;
 
 		void add(command cmd)

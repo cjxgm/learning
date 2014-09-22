@@ -2,6 +2,7 @@
 // some common quad-value (aka 4-element-value)
 #include <allegro5/allegro.h>
 #include <array>
+#include <utility>
 
 namespace imgui
 {
