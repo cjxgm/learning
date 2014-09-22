@@ -1,6 +1,6 @@
 #pragma once
 #include <allegro5/allegro.h>
-#include <list>
+#include <vector>
 #include "state.hh"
 #include "manage.hh"
 #include "command.hh"
@@ -14,7 +14,7 @@ namespace imgui
 		using event_queue_type = ALLEGRO_EVENT_QUEUE;
 		using display_mptr     = managed_ptr<display_type>;
 		using event_queue_mptr = managed_ptr<event_queue_type>;
-		using command_list     = std::list<command>;
+		using command_list     = std::vector<command>;
 		using command_list_cref= command_list const&;
 
 		context(int w, int h);

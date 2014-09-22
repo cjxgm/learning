@@ -127,19 +127,16 @@ int main()
 				imgui::clip_guard guard(cpr, xywh{100, 100, 400, 200});
 				if (guard) {
 					cpr.rect(xywh{100, 100, 400, 200}, rgba{0, 0, 255, (uint8_t)(s.mouse.down ? 200 : 100)});
-					for (int y=0; y<480; y+=20)
-						for (int x=0; x<640; x+=20)
-							cpr.text(xywh{x, y, 20, 20}, "hi");
+					for (int y=0; y<480; y+=30)
+						for (int x=0; x<640; x+=30)
+							cpr.text(xywh{x, y, 20, 20}, "hi", rgba{0, 255, 0}, cpr.make_skip_and_size(20));
 					cpr.rect(xywh{s.mouse.x+10, s.mouse.y+10, 200, 80}, rgba{255, 255, 100, 200});
-					//cpr.text(xywh{s.mouse.x+10, s.mouse.y+10, 200, 80}, text, {0}, cpr.make_skip_and_size(size));
+					cpr.text(xywh{s.mouse.x+10, s.mouse.y+10, 200, 80}, text, rgba{255, 0, 0, 150}, cpr.make_skip_and_size(size));
 				}
 			}
-			//cpr.text(xywh{400,  0, 200, 20}, "input: "s + std::to_string(bm_input.ns()) + " ns");
-			//cpr.text(xywh{400, 20, 200, 20}, "compile: "s + std::to_string(bm_compile.ns()) + " ns");
-			//cpr.text(xywh{400, 40, 200, 20}, "render: "s + std::to_string(bm_render.ns()) + " ns");
 
 			if (a) cpr.rect(xywh{10, 10, 100, 10}, rgba{255, 200});
-			//a = !a;
+			a = !a;
 
 			if (size++ > 64) size = 1;
 		}

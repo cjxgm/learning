@@ -89,30 +89,30 @@ namespace imgui
 
 		auto font = fonts.get(k.first);
 		char buf[2] = { k.second, 0 };
-		int d[4];
-		al_get_text_dimensions(font, buf, d+0, d+1, d+2, d+3);
-		d[2] -= d[0];
-		d[3] -= d[1];
+		// FIXME: how to do this right?
+		// for some monospace font, the character '.' will be very small
+		//
+		//int d[4];
+		//al_get_text_dimensions(font, buf, d+0, d+1, d+2, d+3);
+		//d[2] -= d[0];
+		//d[3] -= d[1];
 
+		auto h = k.first;
+		auto w = h >> 1;
 		bitmap_mptr glyph;
 		glyph.manage(
-				al_create_bitmap(d[2], d[3]),
+				al_create_bitmap(w, h),
 				&al_destroy_bitmap,
 				"cannot create bitmap");
 
 		auto old = al_get_target_bitmap();
 		al_set_target_bitmap(glyph);
 		al_clear_to_color(al_map_rgba(0, 0, 0, 0));
-		al_draw_text(font,
-				al_map_rgba(0xFF, 0xFF, 0xFF, 0xFF),
-				-d[0], -d[1],
-				0, buf);
+		al_draw_text(font, rgba{0xFF}, 0, 0, 0, buf);
 		al_set_target_bitmap(old);
 
 		library::log() << "glyph allocated: ["
-			<< k.first << "] \"" << k.second << "\"    "
-			<< d[0] << ", " << d[1] << ", " << d[2] << ", " << d[3] << ", "
-			<< "\n";
+			<< k.first << "] \"" << k.second << "\"\n";
 
 		return glyph;
 	}
@@ -124,7 +124,7 @@ namespace imgui
 	{
 		static glyph_cache glyphs;
 
-		auto size = std::min(region.h, 2*region.w);
+		auto size = std::max(region.h, region.w << 1);
 		auto glyph = glyphs.get(size, ch);
 		al_draw_tinted_bitmap(glyph, color, region.x, region.y, 0);
 
