@@ -8,7 +8,7 @@
 
 namespace imgui
 {
-	// cache opened direrently-sized font
+	// cache opened differently-sized font
 	struct font_cache
 	{
 		using fontsize_type = int;

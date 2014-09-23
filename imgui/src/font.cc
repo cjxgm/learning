@@ -35,7 +35,7 @@ namespace imgui
 	{
 		auto it = cache.begin();
 		std::advance(it, rand_less(cache.size()));
-		library::log() << "font sacrificed: " << it->first << "\n";
+		library::log() << "font: - [" << it->first << "]\n";
 		cache.erase(it);
 	}
 
@@ -50,7 +50,11 @@ namespace imgui
 				&al_destroy_font,
 				"cannot create font");
 
-		library::log() << "font allocated: [" << s << "]\n";
+		auto rate = int(10000.0f * cache.size() / font_cache_massacre_threshold) / 100.0f;
+		library::log() << "font: + [" << s << "]"
+			<< "\ttotal = " << cache.size()
+			<< "\trate = " << rate << "%\n";
+
 		return std::move(font);
 	}
 
@@ -76,8 +80,7 @@ namespace imgui
 	{
 		auto it = cache.begin();
 		std::advance(it, rand_less(cache.size()));
-		library::log() << "glyph sacrificed: ["
-			<< it->first.first << "] \""
+		library::log() << "glyph: - [" << it->first.first << "] \""
 			<< it->first.second << "\"\n";
 		cache.erase(it);
 	}
@@ -89,13 +92,12 @@ namespace imgui
 
 		auto font = fonts.get(k.first);
 		char buf[2] = { k.second, 0 };
-		// FIXME: how to do this right?
-		// for some monospace font, the character '.' will be very small
+		// FIXME: how to do this right for non-monospace font?
 		//
 		//int d[4];
 		//al_get_text_dimensions(font, buf, d+0, d+1, d+2, d+3);
-		//d[2] -= d[0];
-		//d[3] -= d[1];
+		//auto h = d[3];
+		//auto w = d[2];
 
 		auto h = k.first;
 		auto w = h >> 1;
@@ -111,8 +113,10 @@ namespace imgui
 		al_draw_text(font, rgba{0xFF}, 0, 0, 0, buf);
 		al_set_target_bitmap(old);
 
-		library::log() << "glyph allocated: ["
-			<< k.first << "] \"" << k.second << "\"\n";
+		auto rate = int(10000.0f * cache.size() / glyph_cache_massacre_threshold) / 100.0f;
+		library::log() << "glyph: + [" << k.first << "] \"" << k.second
+			<< "\"\ttotal = " << cache.size()
+			<< "\trate = " << rate << "%\n";
 
 		return glyph;
 	}
