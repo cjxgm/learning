@@ -10,7 +10,7 @@ namespace imgui
 		auto rit = std::remove_if(it, rects.end(),
 				[&r](xyxy const& other) {
 					if (!intersect::rectangle(r, other)) return false;
-					imgui::merge(r, other);
+					math::merge(r, other);
 					return true;
 				});
 		if (rit == rects.end()) return false;

@@ -28,7 +28,7 @@ namespace imgui
 		bool clip(xyxy & r)
 		{
 			if (!valid()) return false;
-			return imgui::clip(get(), r);
+			return math::clip(get(), r);
 		}
 
 		void pop() { stack.pop_back(); }
